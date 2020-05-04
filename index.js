@@ -106,7 +106,12 @@ const parseResponse = ($, theme) => {
 
 const getNumberOfReviews = ($) => {
   const numberRegex = /(\d){1,}/g;
-  return $('#ReviewsHeading').text().match(numberRegex)[0];
+  return {
+    'total': $('#ReviewsHeading').text().match(numberRegex)[0],
+    'positive': $('#ReviewsHeading').parent().find('.icon--review-positive').next().next().text().match(numberRegex)[0],
+    'neutral': $('#ReviewsHeading').parent().find('.icon--review-neutral').next().next().text().match(numberRegex)[0],
+    'negative': $('#ReviewsHeading').parent().find('.icon--review-negative').next().next().text().match(numberRegex)[0]
+  }
 }
 
 const getPercentPositive = ($) => {
