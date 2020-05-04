@@ -99,9 +99,9 @@ const parseResponse = ($, theme) => {
   // const $reviewsDiv = $('#Reviews .grid__item--desktop-up-5').html();
   db[theme] = {
     'numberOfReviews': getNumberOfReviews($),
-    'percentPositive': getPercentPositive($)
+    'reviews': getReviewDataFromPage($)
   }
-  console.log(db);
+  // console.log(db);
 }
 
 const getNumberOfReviews = ($) => {
@@ -110,11 +110,30 @@ const getNumberOfReviews = ($) => {
     'total': $('#ReviewsHeading').text().match(numberRegex)[0],
     'positive': $('#ReviewsHeading').parent().find('.icon--review-positive').next().next().text().match(numberRegex)[0],
     'neutral': $('#ReviewsHeading').parent().find('.icon--review-neutral').next().next().text().match(numberRegex)[0],
-    'negative': $('#ReviewsHeading').parent().find('.icon--review-negative').next().next().text().match(numberRegex)[0]
+    'negative': $('#ReviewsHeading').parent().find('.icon--review-negative').next().next().text().match(numberRegex)[0],
+    'percentPostive': $('.heading--2.gutter-bottom-half').text().match(numberRegex)[0]
   }
 }
 
-const getPercentPositive = ($) => {
-  const numberRegex = /(\d){1,}/g;
-  return $('.heading--2.gutter-bottom-half').text().match(numberRegex)[0];
+const getReviewDataFromPage = ($) => {
+  const reviews = [];
+  $('.review').each((i, el) => {
+    reviews.push({
+      'storeTitle': $(el).find('.review-title__author').text(),
+      'date': $(el).find('.review-title__date').text(),
+      'description': $(el).find('.review__body').text(),
+      'sentiment': analyzeSentiment($(el).find('.review-graph__icon'))
+    });
+  });
+  return reviews;
+}
+
+const analyzeSentiment = (el) => {
+  if (el.hasClass('icon--review-positive')) {
+    return 'positive';
+  } else if (el.hasClass('icon--review-neutral')) {
+    return 'neutral';
+  } else if (el.hasClass('icon--review-negative')) {
+    return 'negative';
+  }
 }
