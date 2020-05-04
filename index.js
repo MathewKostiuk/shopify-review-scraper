@@ -72,20 +72,44 @@ const themes = {
   }
 }
 
+const db = {
+  'reach': {},
+  'empire': {},
+  'grid': {},
+  'handy': {},
+  'atlantic': {},
+  'pacific': {},
+  'editions': {},
+  'launch': {},
+  'startup': {},
+  'vogue': {}
+}
+
 for (const theme in themes) {
   rp(themes[theme])
     .then(function ($) {
-      parseResponse($);
+      parseResponse($, theme);
     })
     .catch(function (err) {
       // Crawling failed or Cheerio choked...
     });
 }
 
-const parseResponse = ($) => {
-  const numberRegex = /(\d){1,}/g;
-  const $reviewsDiv = $('#Reviews .grid__item--desktop-up-5').html();
-  const numberOfReviews = $('#ReviewsHeading').text().match(numberRegex)[0];
-  console.log(numberOfReviews);
+const parseResponse = ($, theme) => {
+  // const $reviewsDiv = $('#Reviews .grid__item--desktop-up-5').html();
+  db[theme] = {
+    'numberOfReviews': getNumberOfReviews($),
+    'percentPositive': getPercentPositive($)
+  }
+  console.log(db);
 }
 
+const getNumberOfReviews = ($) => {
+  const numberRegex = /(\d){1,}/g;
+  return $('#ReviewsHeading').text().match(numberRegex)[0];
+}
+
+const getPercentPositive = ($) => {
+  const numberRegex = /(\d){1,}/g;
+  return $('.heading--2.gutter-bottom-half').text().match(numberRegex)[0];
+}
