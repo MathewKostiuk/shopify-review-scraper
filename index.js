@@ -89,6 +89,7 @@ for (const theme in themes) {
   rp(themes[theme])
     .then(function ($) {
       parseResponse($, theme);
+      getReviewData($, theme);
     })
     .catch(function (err) {
       // Crawling failed or Cheerio choked...
@@ -96,12 +97,9 @@ for (const theme in themes) {
 }
 
 const parseResponse = ($, theme) => {
-  // const $reviewsDiv = $('#Reviews .grid__item--desktop-up-5').html();
   db[theme] = {
-    'numberOfReviews': getNumberOfReviews($),
-    'reviews': getReviewDataFromPage($)
+    'numberOfReviews': getNumberOfReviews($)
   }
-  // console.log(db);
 }
 
 const getNumberOfReviews = ($) => {
@@ -115,8 +113,33 @@ const getNumberOfReviews = ($) => {
   }
 }
 
-const getReviewDataFromPage = ($) => {
+const getReviewData = ($, theme) => {
   const reviews = [];
+
+  if ($('.next_page').length) {
+    const pageReviewsPromises = [];
+    const lastPage = $('.next_page').prev().text();
+    for (let i = 1; i <= lastPage; i++) {
+      const pageObject = {
+        uri: `${themes[theme].uri}?page=${i}`,
+        transform: function (body) {
+          return cheerio.load(body);
+        }
+      }
+      const promise = rp(pageObject).then($ => getReviewDataFromPage($, reviews))
+      pageReviewsPromises.push(promise);
+    }
+
+    Promise.all(pageReviewsPromises)
+      .then(results => {
+        db[theme]['reviews'] = results[0];
+      });
+  } else {
+    db[theme]['reviews'] = getReviewDataFromPage($, reviews);
+  }
+}
+
+const getReviewDataFromPage = ($, reviews) => {
   $('.review').each((i, el) => {
     reviews.push({
       'storeTitle': $(el).find('.review-title__author').text(),
