@@ -5,6 +5,14 @@ const port = process.env.PORT || 3000
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 
+const db = require("./data/db.js");
+
+app.get("/reviews", async (req, res) => {
+  const reviews = await db("themes");
+  res.json({ reviews });
+});
+
+
 app.get('/', (req, res) => res.send('Hello World!'))
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
@@ -72,7 +80,7 @@ const themes = {
   }
 }
 
-const db = {
+const testDb = {
   'reach': {},
   'empire': {},
   'grid': {},
@@ -97,7 +105,7 @@ for (const theme in themes) {
 }
 
 const parseResponse = ($, theme) => {
-  db[theme] = {
+  testDb[theme] = {
     'numberOfReviews': getNumberOfReviews($)
   }
 }
@@ -126,21 +134,30 @@ const getReviewData = ($, theme) => {
           return cheerio.load(body);
         }
       }
-      const promise = rp(pageObject).then($ => getReviewDataFromPage($, reviews))
+      const promise = rp(pageObject).then($ => getReviewDataFromPage($, reviews, theme))
       pageReviewsPromises.push(promise);
     }
 
     Promise.all(pageReviewsPromises)
       .then(results => {
-        db[theme]['reviews'] = results[0];
+        testDb[theme]['reviews'] = results[0];
       });
   } else {
-    db[theme]['reviews'] = getReviewDataFromPage($, reviews);
+    testDb[theme]['reviews'] = getReviewDataFromPage($, reviews, theme);
   }
 }
 
-const getReviewDataFromPage = ($, reviews) => {
+const getReviewDataFromPage = ($, reviews, theme) => {
   $('.review').each((i, el) => {
+    db('reviews').insert({
+      themeTitle: theme,
+      storeTitle: $(el).find('.review-title__author').text(),
+      description: $(el).find('.review__body').text(),
+      sentiment: analyzeSentiment($(el).find('.review-graph__icon')),
+      date: '1999-02-02'
+    }).then(() => {
+      console.log('done');
+    })
     reviews.push({
       'storeTitle': $(el).find('.review-title__author').text(),
       'date': $(el).find('.review-title__date').text(),
