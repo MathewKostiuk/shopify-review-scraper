@@ -1,9 +1,15 @@
 {
   "name": "shopify-review-scraper",
   "version": "1.0.0",
+  "engines": {
+    "node": "~12",
+    "npm": "~6"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "db": "knex migrate:rollback && knex migrate:latest && knex seed:run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
