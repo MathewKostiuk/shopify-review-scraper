@@ -11,8 +11,7 @@ const { checkForNewReviews } = require("./lib/cron-helpers");
 app.use('/themes', themesRoutes);
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-cron.schedule('* * * * *', async () => {
+cron.schedule('1 * * * *', async () => {
   const newReviews = await checkForNewReviews();
-  console.log(newReviews);
 })
 
