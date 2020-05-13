@@ -6,7 +6,7 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('themes').insert([
         { name: 'atlantic', url: 'https://themes.shopify.com/themes/atlantic/styles/modern' },
-        { name: 'edtions', url: 'https://themes.shopify.com/themes/editions/styles/modern' },
+        { name: 'editions', url: 'https://themes.shopify.com/themes/editions/styles/modern' },
         { name: 'empire', url: 'https://themes.shopify.com/themes/empire/styles/supply' },
         { name: 'grid', url: 'https://themes.shopify.com/themes/grid/styles/bright' },
         { name: 'handy', url: 'https://themes.shopify.com/themes/handy/styles/cool' },
