@@ -14,6 +14,5 @@ app.listen(port);
 cron.schedule('1 * * * *', async () => {
   const newReviews = await checkForNewReviews();
   const date = new Date();
-  console.log(`Last crawled at ${date.toLocaleDateString()}`);
+  console.log(`Last crawled on ${date.toLocaleDateString()} at ${date.toLocaleTimeString('en-US')}`);
 })
-
