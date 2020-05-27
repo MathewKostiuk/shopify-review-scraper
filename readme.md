@@ -3,7 +3,7 @@
 This app is used to periodically search the Shopify Theme Store for new or deleted theme reviews. Team members can be notified via Slack when reviews are created or deleted to help turn around negative reviews efficiently.
 
 ## Changing the configured themes
----
+
 The app works by checking the `themes` column in the database and periodically checks for review changes. The simplest way to change what themes the app looks for is to change the seed data to match the themes you want to look for. 
 
 You can either edit the included `add_themes_to_themes.js` file or delete it and generate a new one with the command `knex seed:make seed_name`. Each seed entry should be in this format:
@@ -22,7 +22,7 @@ If you're sending reviews to a different channel within Pixel Union's workspace 
 
 
 ## Working on the app locally
----
+
 To work on this app locally requires 2 environment variables to be configured to read/write to/from the database and to connect to a Slack channel.
 
 ### PostgreSQL Database
@@ -40,3 +40,13 @@ postgresql://username:password@host:port/database_name
 ```
 6. Save this as an environment variable in the `.env` file as `DATABASE_URL`
 7. Now, you should be able to run the command `npm run db` to run the migrations and seed the database.
+
+## Running the app
+
+Once you have the `SLACK_URL` & `DATABASE_URL` environment variables configured you can run `npm start` to run the app! The app automatically checks for new reviews every hour at the 1 minute mark (12:01, etc.)
+
+If you ever want to restart the database you can run the `npm run db` command to rollback, migrate, & seed the database.
+
+## Deploying
+
+The app is hosted on Heroku and is configured to automatically deploy any changes that are pushed to `master`. 
