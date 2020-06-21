@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-const { getAllThemes, getReviews, saveReview, deleteReview, saveRanking } = require('./data-helpers');
-const { scrapeTheme, processReviewDataFromPage, getTotalNumberOfPages, processRankingDataFromPage } = require('./utils/scraper-helpers');
+const { getAllThemes, getReviews, saveReview, deleteReview, saveRanking } = require('../db/db-access');
+const { scrapeTheme, processReviewDataFromPage, getTotalNumberOfPages, processRankingDataFromPage } = require('./scraper');
 
 const checkForNewReviews = async () => {
   let themes, reviews, savedThemes;
