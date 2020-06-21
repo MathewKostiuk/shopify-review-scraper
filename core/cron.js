@@ -1,12 +1,13 @@
 const axios = require('axios');
 
-const { getAllThemes, getReviews, saveReview, deleteReview, saveRanking } = require('../db/db-access');
-const { scrapeTheme, processReviewDataFromPage, getTotalNumberOfPages, processRankingDataFromPage } = require('./scraper');
+const DBAccess = require('../db/db-access');
+const Scraper = require('./scraper');
+const Utilities = require('./utilities');
 
 const checkForNewReviews = async () => {
   let themes, reviews, savedThemes;
   try {
-    themes = await getAllThemes();
+    themes = await DBAccess.getAllThemes();
   } catch (error) {
     console.log(error);
     return null;
@@ -15,12 +16,12 @@ const checkForNewReviews = async () => {
     let pageData;
 
     try {
-      pageData = await scrapeTheme(theme.url, 1);
+      pageData = await Scraper.scrapeTheme(theme.url, 1);
     } catch (error) {
       console.log(error)
       return null;
     }
-    const pagesToFetch = getTotalNumberOfPages(pageData);
+    const pagesToFetch = Utilities.getTotalNumberOfPages(pageData);
     return {
       ...theme,
       pagesToFetch
@@ -34,8 +35,9 @@ const checkForNewReviews = async () => {
     return null;
   }
 
-  const flattenedReviews = flattenArray(reviews, 2);
+  const flattenedReviews = Utilities.flattenArray(reviews, 2);
   const processedThemes = await Promise.all(flattenedReviews.map(async theme => await processReviewsByTheme(theme)));
+
 
   try {
     savedThemes = await actionReviews(processedThemes);
@@ -53,17 +55,17 @@ const fetchReviews = async (themes) => {
       let pageData;
 
       try {
-        pageData = await scrapeTheme(theme.url, i);
+        pageData = await Scraper.scrapeTheme(theme.url, i);
       } catch (error) {
         console.log(error);
         continue;
       }
 
-      const newReviewsFromPage = processReviewDataFromPage(pageData, theme);
+      const newReviewsFromPage = Scraper.processReviewDataFromPage(pageData, theme);
       newReviews.push(newReviewsFromPage);
     }
     return {
-      [theme.name]: flattenArray(newReviews)
+      [theme.name]: Utilities.flattenArray(newReviews)
     };
   }));
   return themeReviews;
@@ -75,7 +77,7 @@ const processReviewsByTheme = async theme => {
   const currentThemeName = Object.keys(theme)[0];
 
   try {
-    databaseResults = await getReviews(currentThemeName);
+    databaseResults = await DBAccess.getReviews(currentThemeName);
   } catch (error) {
     console.log(error);
     return null;
@@ -93,7 +95,7 @@ const processReviewsByTheme = async theme => {
   // We need to check if the review already exists within the database
   // If it doesn't, we'll save it and ping Slack
   const filteredPageReviews = currentThemeReviews.filter((review) => {
-    return isUnique(review, databaseResults);
+    return Utilities.isUnique(review, databaseResults);
   });
   if (filteredPageReviews.length) {
     processed.save = filteredPageReviews;
@@ -104,7 +106,7 @@ const processReviewsByTheme = async theme => {
   // We need to check if the database entry still exists on the page
   // If it doesn't, we'll delete it and ping Slack
   const filteredDatabaseReviews = databaseResults.filter((review) => {
-    return isUnique(review, currentThemeReviews);
+    return Utilities.isUnique(review, currentThemeReviews);
   });
   if (filteredDatabaseReviews.length) {
     processed.delete = filteredDatabaseReviews;
@@ -123,7 +125,7 @@ const actionReviews = async (themes) => {
       toSave.forEach(async review => {
         let savedReview;
         try {
-          savedReview = await saveReview(review);
+          savedReview = await DBAccess.saveReview(review);
           if (shouldPingSlack) {
             pingSlack(review, true);
           }
@@ -136,7 +138,7 @@ const actionReviews = async (themes) => {
       toDelete.forEach(async review => {
         let deletedReview;
         try {
-          deletedReview = await deleteReview(review);
+          deletedReview = await DBAccess.deleteReview(review);
           if (shouldPingSlack) {
             pingSlack(review, false);
           }
@@ -149,8 +151,8 @@ const actionReviews = async (themes) => {
 }
 
 const pingSlack = (review, isNew) => {
-  const messageHeading = isNew ? `*${review.storeTitle}* left a new ${review.sentiment} review for *${capitalizeFirstLetter(review.themeTitle)}*:` :
-    `*${review.storeTitle}* removed their ${review.sentiment} review for ${capitalizeFirstLetter(review.themeTitle)}:`;
+  const messageHeading = isNew ? `*${review.storeTitle}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(review.themeTitle)}*:` :
+    `*${review.storeTitle}* removed their ${review.sentiment} review for ${Utilities.capitalizeFirstLetter(review.themeTitle)}:`;
 
   const options = {
     method: 'post',
@@ -183,44 +185,24 @@ const pingSlack = (review, isNew) => {
   console.log(`Incoming review: ${review}`);
 }
 
-const flattenArray = (arr, depth = 1) => {
-  return depth > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val, depth - 1) : val), [])
-    : arr.slice()
-}
-
-const isUnique = (review, array) => {
-  let unique = true;
-  for (let i = 0; i < array.length; i ++) {
-    if (review.storeTitle === array[i].storeTitle && review.description === array[i].description && review.sentiment === array[i].sentiment) {
-      unique = false;
-      break;
-    }
-  }
-  return unique;
-}
-
-const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const fetchRankingPage = async () => {
   const url = `https://themes.shopify.com/themes`;
 
-  const themes = await getAllThemes();
+  const themes = await DBAccess.getAllThemes();
 
-  const firstPage = await scrapeTheme(url, 1, true);
-  const numberOfPages = getTotalNumberOfPages(firstPage);
+  const firstPage = await Scraper.scrapeTheme(url, 1, true);
+  const numberOfPages = Utilities.getTotalNumberOfPages(firstPage);
   const rankings = [];
 
   for (let i = 1; i <= numberOfPages; i++) {
-    const pageData = await scrapeTheme(url, i, true);
-    const pageRankings = processRankingDataFromPage(pageData, i, themes);
+    const pageData = await Scraper.scrapeTheme(url, i, true);
+    const pageRankings = Scraper.processRankingDataFromPage(pageData, i, themes);
     rankings.push(pageRankings);
   }
-  const flattened = flattenArray(rankings);
+  const flattened = Utilities.flattenArray(rankings);
 
-  flattened.forEach(ranking => saveRanking(ranking));
+  flattened.forEach(ranking => DBAccess.saveRanking(ranking));
   return true;
 }
 
-module.exports = { checkForNewReviews, flattenArray, fetchRankingPage }
+module.exports = { checkForNewReviews, fetchRankingPage }

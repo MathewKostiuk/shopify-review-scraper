@@ -1,14 +1,14 @@
 const express = require('express');
 const themesRoutes = express.Router();
 
-module.exports = (DataHelpers) => {
+module.exports = (DBAccess) => {
   themesRoutes.get('/', async (req, res) => {
-    const themes = await DataHelpers.getAllThemes();
+    const themes = await DBAccess.getAllThemes();
     res.json({ themes });
   })
 
   themesRoutes.get('/:theme', async (req, res) => {
-    const themeReviews = await DataHelpers.getReviews(req.params.theme);
+    const themeReviews = await DBAccess.getReviews(req.params.theme);
     res.json({ themeReviews });
   })
 
