@@ -2,11 +2,11 @@
 const db = require('./index');
 
  class DBAccess {
-  static async getAllThemes () {
+  static async getAllThemes() {
     return await db('themes');
   }
   
-  static async saveReview (review) {
+  static async saveReview(review) {
     try {
       return await db('reviews').insert(review, ['storeTitle', 'themeTitle', 'sentiment', 'description', 'date']);
     } catch (error) {
@@ -14,7 +14,7 @@ const db = require('./index');
     }
   }
   
-  static async deleteReview (review) {
+  static async deleteReview(review) {
     try {
       return await db('reviews').where({
         storeTitle: review.storeTitle,
@@ -28,7 +28,7 @@ const db = require('./index');
     }
   }
   
-  static async getReviews (theme) {
+  static async getReviews(theme) {
     try {
       const reviews = await db('reviews').where('themeTitle', theme).orderBy('date', 'desc');
       return reviews;
@@ -37,7 +37,7 @@ const db = require('./index');
     }
   }
   
-  static async saveRanking (rank) {
+  static async saveRanking(rank) {
     try {
       return await db('rankings').insert(rank);
     } catch (error) {

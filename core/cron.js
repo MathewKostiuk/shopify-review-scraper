@@ -16,7 +16,7 @@ const checkForNewReviews = async () => {
     let pageData;
 
     try {
-      pageData = await Scraper.scrapeTheme(theme.url, 1);
+      pageData = await Scraper.scrapePage(theme.url, 1);
     } catch (error) {
       console.log(error)
       return null;
@@ -55,7 +55,7 @@ const fetchReviews = async (themes) => {
       let pageData;
 
       try {
-        pageData = await Scraper.scrapeTheme(theme.url, i);
+        pageData = await Scraper.scrapePage(theme.url, i);
       } catch (error) {
         console.log(error);
         continue;
@@ -185,24 +185,4 @@ const pingSlack = (review, isNew) => {
   console.log(`Incoming review: ${review}`);
 }
 
-const fetchRankingPage = async () => {
-  const url = `https://themes.shopify.com/themes`;
-
-  const themes = await DBAccess.getAllThemes();
-
-  const firstPage = await Scraper.scrapeTheme(url, 1, true);
-  const numberOfPages = Utilities.getTotalNumberOfPages(firstPage);
-  const rankings = [];
-
-  for (let i = 1; i <= numberOfPages; i++) {
-    const pageData = await Scraper.scrapeTheme(url, i, true);
-    const pageRankings = Scraper.processRankingDataFromPage(pageData, i, themes);
-    rankings.push(pageRankings);
-  }
-  const flattened = Utilities.flattenArray(rankings);
-
-  flattened.forEach(ranking => DBAccess.saveRanking(ranking));
-  return true;
-}
-
-module.exports = { checkForNewReviews, fetchRankingPage }
+module.exports = { checkForNewReviews }
