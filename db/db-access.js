@@ -8,7 +8,7 @@ const db = require('./index');
   
   static async saveReview(review) {
     try {
-      return await db('reviews').insert(review, ['storeTitle', 'themeTitle', 'sentiment', 'description', 'date']);
+      return await db('reviews').insert(review, ['storeTitle', 'handle', 'sentiment', 'description', 'date']);
     } catch (error) {
       console.log(error);
     }
@@ -18,7 +18,7 @@ const db = require('./index');
     try {
       return await db('reviews').where({
         storeTitle: review.storeTitle,
-        themeTitle: review.themeTitle,
+        handle: review.handle,
         sentiment: review.sentiment,
         description: review.description
       })
@@ -30,7 +30,7 @@ const db = require('./index');
   
   static async getReviews(theme) {
     try {
-      const reviews = await db('reviews').where('themeTitle', theme).orderBy('date', 'desc');
+      const reviews = await db('reviews').where('handle', theme).orderBy('date', 'desc');
       return reviews;
     } catch (error) {
       console.log(error);

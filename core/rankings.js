@@ -22,7 +22,7 @@ class Rankings {
   }
 
   async getThemes() {
-    return await DBAccess.getAllThemes();
+    return await DBAccess.getAllThemes().catch(e => console.log(e));
   }
 
   async fetchAllRankings() {
