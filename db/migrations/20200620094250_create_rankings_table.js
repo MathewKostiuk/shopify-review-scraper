@@ -5,7 +5,7 @@ exports.up = function(knex) {
         table.increments('rankingId');
         table.integer('rank').unsigned();
         table.integer('themeId').unsigned().notNullable();
-        table.string('themeHandle').unique();
+        table.string('themeHandle');
         table.date('date');
         table.foreign('themeId').references('themeId').inTable('themes');
     })

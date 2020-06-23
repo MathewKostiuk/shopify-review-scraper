@@ -17,7 +17,7 @@ class Rankings {
     this.numberOfPages = Utilities.getTotalNumberOfPages(this.pageData[0]);
     const success = await this.fetchAllRankings().catch(e => console.log(e));
     this.processPages();
-    this.saveRankings();
+    const response = await this.saveRankings();
   }
 
   async getThemes() {
@@ -46,14 +46,14 @@ class Rankings {
       const themeHandle = $(el).attr('data-trekkie-theme-handle');
       const rank = (24 * (pageNumber - 1)) + i + 1;
       for (let j = 0; j < this.themes.length; j++) {
-        if (this.themes[j].name === themeHandle) {
+        if (this.themes[j].handle === themeHandle) {
           const ranking = {
             rank: rank,
             themeId: this.themes[j].themeId,
-            themeHandle: this.themes[j].name,
+            themeHandle: this.themes[j].handle,
             date: new Date(Date.now())
           }
-          this.rankings.push(ranking);
+          this.rankings = [...this.rankings, ranking];
         }
       }
     });
