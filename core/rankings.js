@@ -16,7 +16,6 @@ class Rankings {
     this.pageData.push(await this.scrapers[0].scrapePage().catch(e => console.log(e)));
     this.numberOfPages = Utilities.getTotalNumberOfPages(this.pageData[0]);
     const success = await this.fetchAllRankings().catch(e => console.log(e));
-    console.log(success);
     this.processPages();
     this.saveRankings();
   }
