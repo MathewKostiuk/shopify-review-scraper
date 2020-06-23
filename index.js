@@ -4,24 +4,16 @@ const port = process.env.PORT || 3000
 
 const DBAccess = require('./db/db-access');
 const themesRoutes = require('./routes/themes')(DBAccess);
+const CronJobs = require('./core/cron-jobs');
 
-const cron = require('node-cron');
 const Reviews = require('./core/reviews');
 const Rankings = require('./core/rankings');
 
 app.use('/themes', themesRoutes);
 app.listen(port);
 
-cron.schedule('1 * * * *', async () => {
-  const reviews = new Reviews();
-  const response = await reviews.init();
-  const date = new Date();
-  console.log(`Last crawled for reviews on ${date.toLocaleDateString()} at ${date.toLocaleTimeString('en-US')}`);
-})
+const reviewsCronJob = new CronJobs('5 * * * *', 'reviews', Reviews);
+reviewsCronJob.run();
 
-cron.schedule('0 20 * * *', async () => {
-  const rankings = new Rankings();
-  const response = await rankings.init();
-  const date = new Date();
-  console.log(`Last crawled the leaderboard on ${date.toLocaleDateString()} at ${date.toLocaleTimeString('en-US')}`);
-});
+const leaderboardCronJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings);
+leaderboardCronJob.run();
