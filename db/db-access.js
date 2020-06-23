@@ -2,23 +2,23 @@
 const db = require('./index');
 
  class DBAccess {
-  static async getAllThemes () {
+  static async getAllThemes() {
     return await db('themes');
   }
   
-  static async saveReview (review) {
+  static async saveReview(review) {
     try {
-      return await db('reviews').insert(review, ['storeTitle', 'themeTitle', 'sentiment', 'description', 'date']);
+      return await db('reviews').insert(review, ['storeTitle', 'handle', 'sentiment', 'description', 'date']);
     } catch (error) {
       console.log(error);
     }
   }
   
-  static async deleteReview (review) {
+  static async deleteReview(review) {
     try {
       return await db('reviews').where({
         storeTitle: review.storeTitle,
-        themeTitle: review.themeTitle,
+        handle: review.handle,
         sentiment: review.sentiment,
         description: review.description
       })
@@ -28,16 +28,16 @@ const db = require('./index');
     }
   }
   
-  static async getReviews (theme) {
+  static async getReviews(theme) {
     try {
-      const reviews = await db('reviews').where('themeTitle', theme).orderBy('date', 'desc');
+      const reviews = await db('reviews').where('handle', theme).orderBy('date', 'desc');
       return reviews;
     } catch (error) {
       console.log(error);
     }
   }
   
-  static async saveRanking (rank) {
+  static async saveRanking(rank) {
     try {
       return await db('rankings').insert(rank);
     } catch (error) {
