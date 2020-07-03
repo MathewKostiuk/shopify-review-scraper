@@ -14,5 +14,3 @@ module.exports = (DBAccess) => {
 
   return themesRoutes;
 }
-
-

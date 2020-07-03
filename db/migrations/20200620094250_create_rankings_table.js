@@ -2,12 +2,12 @@
 exports.up = function(knex) {
   return knex.schema
     .createTable('rankings', table => {
-        table.increments('rankingId');
+        table.increments('id');
         table.integer('rank').unsigned();
-        table.integer('themeId').unsigned().notNullable();
-        table.string('themeHandle');
+        table.integer('theme').unsigned().notNullable();
+        table.string('name');
         table.date('date');
-        table.foreign('themeId').references('themeId').inTable('themes');
+        table.foreign('theme').references('themeId').inTable('themes');
     })
 };
 
