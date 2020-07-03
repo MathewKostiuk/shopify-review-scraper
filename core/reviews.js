@@ -31,6 +31,8 @@ class Reviews {
     scrapers.push(new Scraper(theme.url, 1, false));
     pageData.push(await scrapers[0].scrapePage().catch(e => console.log(e)));
     numberOfPages = Utilities.getTotalNumberOfPages(pageData[0]);
+    
+    this.processReviewPercentage(pageData[0], theme);
     this.processReviewDataFromPage(pageData[0], theme);
 
     for (let i = 1; i < numberOfPages; i++) {
@@ -38,6 +40,18 @@ class Reviews {
       pageData.push(await scrapers[i].scrapePage().catch(e => console.log(e)));
       this.processReviewDataFromPage(pageData[i], theme);
     }
+  }
+
+  processReviewPercentage($, theme) {
+    const percentageRegex = /\d{1,}/g;
+    const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
+    const entry = {
+      percentPositive: Number(percentage[0]),
+      name: theme.handle,
+      theme: theme.themeId,
+      date: new Date(Date.now())
+    }
+    DBAccess.savePercentage(entry);
   }
 
   processReviewDataFromPage($, theme) {
@@ -87,7 +101,8 @@ class Reviews {
       }
     }
     axios(options)
-    console.log(`Incoming review: ${review}`);
+      .then(() => console.log(`Incoming review: ${review}`))
+      .catch(error => console.log(error));
   }
 
   dispatchReviews() {

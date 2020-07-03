@@ -44,6 +44,15 @@ const db = require('./index');
       console.log(error);
     }
   }
+
+  static async savePercentage(percentage) {
+    console.log(percentage);
+    try {
+      return await db('percentPositive').insert(percentage);      
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 
