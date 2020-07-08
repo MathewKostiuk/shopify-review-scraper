@@ -1,17 +1,6 @@
 const cheerio = require('cheerio');
 
 class Utilities {
-  static generateRpOptions(url, page, isRankPage = false) {
-    const uri = isRankPage ? `${url}?page=${page}&sort_by=popularity` :
-      `${url}?page=${page}`;
-    return {
-      uri: uri,
-      transform: (body) => {
-        return cheerio.load(body)
-      }
-    }
-  }
-
   static analyzeSentiment(el) {
     if (el.hasClass('icon--review-positive')) {
       return 'positive';
@@ -50,11 +39,6 @@ class Utilities {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  static flattenArray(arr, depth = 1) {
-    return depth > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? this.flattenArray(val, depth - 1) : val), [])
-      : arr.slice()
-  }
-  
   static isUnique(review, array) {
     let unique = true;
     for (let i = 0; i < array.length; i ++) {

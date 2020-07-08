@@ -37,7 +37,7 @@ const db = require('./index');
     }
   }
   
-  static async saveRanking(rank) {
+  static async insertRankings(rank) {
     try {
       return await db('rankings').insert(rank);
     } catch (error) {
