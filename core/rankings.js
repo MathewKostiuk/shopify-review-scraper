@@ -72,8 +72,7 @@ class Rankings {
           const ranking = {
             rank: rank,
             theme: this.themes[j].themeId,
-            name: this.themes[j].handle,
-            date: new Date(Date.now())
+            name: this.themes[j].handle
           }
           this.rankings = [...this.rankings, ranking];
         }

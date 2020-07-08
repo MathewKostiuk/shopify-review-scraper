@@ -8,6 +8,7 @@ const CronJobs = require('./core/cron-jobs');
 
 const Reviews = require('./core/reviews');
 const Rankings = require('./core/rankings');
+const ReviewPercentages = require('./core/review-percentage');
 
 app.use('/themes', themesRoutes);
 app.listen(port);
@@ -17,3 +18,6 @@ reviewsCronJob.run();
 
 const leaderboardCronJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings);
 leaderboardCronJob.run();
+
+const reviewPercentagesCronJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
+reviewPercentagesCronJob.run();

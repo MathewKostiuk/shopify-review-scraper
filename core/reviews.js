@@ -12,8 +12,8 @@ class Reviews {
 
   async init() {
     this.themes = await this.getThemes().catch(e => console.log(e));
-    const success = await Promise.all(this.themes.map(async theme => await this.runScrapers(theme))).catch(e => console.log(e));
-    const success2 = await this.processReviews().catch(e => console.log(e));
+    await Promise.all(this.themes.map(async theme => await this.runScrapers(theme))).catch(e => console.log(e));
+    await this.processReviews().catch(e => console.log(e));
     this.dispatchReviews();
     return true;
   }
@@ -32,7 +32,6 @@ class Reviews {
     pageData.push(await scrapers[0].scrapePage().catch(e => console.log(e)));
     numberOfPages = Utilities.getTotalNumberOfPages(pageData[0]);
     
-    this.processReviewPercentage(pageData[0], theme);
     this.processReviewDataFromPage(pageData[0], theme);
 
     for (let i = 1; i < numberOfPages; i++) {
@@ -40,18 +39,6 @@ class Reviews {
       pageData.push(await scrapers[i].scrapePage().catch(e => console.log(e)));
       this.processReviewDataFromPage(pageData[i], theme);
     }
-  }
-
-  processReviewPercentage($, theme) {
-    const percentageRegex = /\d{1,}/g;
-    const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
-    const entry = {
-      percentPositive: Number(percentage[0]),
-      name: theme.handle,
-      theme: theme.themeId,
-      date: new Date(Date.now())
-    }
-    DBAccess.savePercentage(entry);
   }
 
   processReviewDataFromPage($, theme) {
