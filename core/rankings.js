@@ -45,17 +45,17 @@ class Rankings {
   }
 
   async saveRankingsToDashboard() {
-    console.log(process.env.DASHBOARD_URL);
     if (!process.env.DASHBOARD_URL) {
       return;
     }
+    
     const options = {
       method: 'post',
       url: `${process.env.DASHBOARD_URL}/api/2.0/platform/shopify/themes/rankings`,
       data: this.rankings,
       auth: {
-        username: process.env.SCRAPER_USERNAME,
-        password: process.env.SCRAPER_PASSWORD
+        username: 'paskit',
+        password: process.env.PASKIT_PASSWORD
       }
     };
     axios(options)
