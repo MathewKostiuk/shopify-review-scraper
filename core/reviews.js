@@ -12,31 +12,24 @@ class Reviews {
 
   async init() {
     this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
-    await Promise.all(this.themes.map(async theme => await this.runScrapers(theme))).catch(e => console.log(e));
+    await Promise.all(this.themes.map(async theme => await this.fetchData(theme))).catch(e => console.log(e));
     await this.processReviews().catch(e => console.log(e));
     this.dispatchReviews();
     return true;
   }
 
-  async runScrapers(theme) {
-    let scrapers = [];
-    let pageData = [];
+  async fetchData(theme) {
     this.reviews[theme.handle] = [];
-    let numberOfPages;
 
-    scrapers.push(new Scraper(theme.url, 1, false));
-    pageData.push(await scrapers[0].scrapePage().catch(e => console.log(e)));
-    numberOfPages = Utilities.getTotalNumberOfPages(pageData[0]);
+    const scraper = new Scraper(theme.url, 1, false);
+    const pageData = await scraper.pageData;
+    const numberOfPages = Utilities.getTotalNumberOfPages(pageData);
 
-    const firstPageReviews = Utilities.processReviewDataFromPage(pageData[0], theme);
-    this.reviews[theme.handle] = [...this.reviews[theme.handle], ...firstPageReviews];
-
-    for (let i = 1; i < numberOfPages; i++) {
-      scrapers.push(new Scraper(theme.url, i + 1, false));
-      pageData.push(await scrapers[i].scrapePage().catch(e => console.log(e)));
-      const pageReviews = Utilities.processReviewDataFromPage(pageData[i], theme);
+    for (let i = 0; i < numberOfPages; i++) {
+      const newScraper = new Scraper(theme.url, i + 1, false);
+      const newPageData = await newScraper.pageData;
+      const pageReviews = Utilities.processReviewDataFromPage(newPageData, theme);
       this.reviews[theme.handle] = [...this.reviews[theme.handle], ...pageReviews];
-      console.log(i, this.reviews[theme.handle]);
     }
   }
 

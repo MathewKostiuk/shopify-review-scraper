@@ -14,17 +14,11 @@ class Rankings {
 
   async init() {
     this.themes = await this.getThemes().catch(e => console.log(e));
-    this.scrapers.push(new Scraper(this.url, 1, true));
-    this.pageData.push(await this.scrapers[0].scrapePage().catch(e => console.log(e)));
-    this.numberOfPages = Utilities.getTotalNumberOfPages(this.pageData[0]);
+    const scraper = new Scraper(this.url, 1, true);
+    const pageData = await scraper.pageData;
+    this.numberOfPages = Utilities.getTotalNumberOfPages(pageData);
 
     await this.fetchAllRankings().catch(e => console.log(e));
-
-    this.pageData.forEach((page, index) => {
-      const rankingsFromPage = Utilities.processRankingDataFromPage(page, index + 1, this.themes);
-      this.rankings = [...this.rankings, ...rankingsFromPage];
-    });
-    
     await DBAccess.insertRankings(this.rankings);
     this.insertRankingssToDashboard();
   }
@@ -34,10 +28,12 @@ class Rankings {
   }
 
   async fetchAllRankings() {
-    for (let i = 1; i < this.numberOfPages; i++) {
+    for (let i = 0; i < this.numberOfPages; i++) {
       const pageNumber = i + 1;
-      this.scrapers.push(new Scraper(this.url, pageNumber, true));
-      this.pageData.push(await this.scrapers[i].scrapePage().catch(e => console.log(e)));
+      const scraper = new Scraper(this.url, pageNumber, true);
+      const pageData = await scraper.pageData;
+      const rankingsFromPage = Utilities.processRankingDataFromPage(pageData, i + 1, this.themes);
+      this.rankings = [...this.rankings, ...rankingsFromPage];
     }
     return true;
   }

@@ -1,12 +1,13 @@
 const rp = require('request-promise');
-const Utilities = require('./utilities');
+const cheerio = require('cheerio');
 
 class Scraper {
   constructor(url, pageNumber, isRankPage) {
-    this.url = url;
-    this.pageNumber = pageNumber;
-    this.isRankPage = isRankPage;
-    this.options = Utilities.generateRpOptions(this.url, this.pageNumber, this.isRankPage);
+    this.options = this.generateRpOptions(url, pageNumber, isRankPage);
+  }
+
+  get pageData() {
+    return this.scrapePage();
   }
 
   async scrapePage() {
@@ -18,6 +19,17 @@ class Scraper {
       return null;
     }
     return $;
+  }
+
+  generateRpOptions(url, page, isRankPage = false) {
+    const uri = isRankPage ? `${url}?page=${page}&sort_by=popularity` :
+      `${url}?page=${page}`;
+    return {
+      uri: uri,
+      transform: (body) => {
+        return cheerio.load(body)
+      }
+    }
   }
 }
 

@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 const DBAccess = require('../db/db-access');
 const Scraper = require('./scraper');
 const Utilities = require('./utilities');
@@ -12,18 +10,16 @@ class ReviewPercentages {
   async init() {
     this.themes = await DBAccess.getAllThemes()
       .catch(e => console.log(e));
-    await Promise.all(this.themes.map(async theme => await this.runScraper(theme)))
+    await Promise.all(this.themes.map(async theme => await this.fetchData(theme)))
       .catch(e => console.log(e));
     DBAccess.savePercentage(this.percentages);
   }
 
-  async runScraper(theme) {
-    let scrapers = [];
-    let pageData = [];
+  async fetchData(theme) {
+    const scraper = new Scraper(theme.url, 1, false);
+    const pageData = await scraper.pageData;
 
-    scrapers.push(new Scraper(theme.url, 1, false));
-    pageData.push(await scrapers[0].scrapePage().catch(e => console.log(e)));
-    const percentage = Utilities.processReviewPercentage(pageData[0], theme);
+    const percentage = Utilities.processReviewPercentage(pageData, theme);
     this.percentages = [...this.percentages, percentage];
   }
 }
