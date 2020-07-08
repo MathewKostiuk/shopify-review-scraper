@@ -17,10 +17,16 @@ class Rankings {
     this.scrapers.push(new Scraper(this.url, 1, true));
     this.pageData.push(await this.scrapers[0].scrapePage().catch(e => console.log(e)));
     this.numberOfPages = Utilities.getTotalNumberOfPages(this.pageData[0]);
-    const success = await this.fetchAllRankings().catch(e => console.log(e));
-    this.processPages();
-    const response = await this.saveRankings();
-    this.saveRankingsToDashboard();
+
+    await this.fetchAllRankings().catch(e => console.log(e));
+
+    this.pageData.forEach((page, index) => {
+      const rankingsFromPage = Utilities.processRankingDataFromPage(page, index + 1, this.themes);
+      this.rankings = [...this.rankings, ...rankingsFromPage];
+    });
+    
+    await DBAccess.insertRankings(this.rankings);
+    this.insertRankingssToDashboard();
   }
 
   async getThemes() {
@@ -36,15 +42,7 @@ class Rankings {
     return true;
   }
 
-  processPages() {
-    this.pageData.forEach((page, index) => this.processRankingDataFromPage(page, index + 1));
-  }
-
-  async saveRankings() {
-    this.rankings.forEach(async ranking => await DBAccess.saveRanking(ranking).catch(e => console.log(e)));
-  }
-
-  async saveRankingsToDashboard() {
+  async insertRankingssToDashboard() {
     if (!process.env.DASHBOARD_URL) {
       return;
     }
@@ -61,23 +59,6 @@ class Rankings {
     axios(options)
       .then(() => console.log('Rankings submitted to the Themes Dashboard'))
       .catch(error => console.log(error));
-  }
-
-  processRankingDataFromPage($, pageNumber) {
-    $('.theme-info a').each((i, el) => {
-      const themeHandle = $(el).attr('data-trekkie-theme-handle');
-      const rank = (24 * (pageNumber - 1)) + i + 1;
-      for (let j = 0; j < this.themes.length; j++) {
-        if (this.themes[j].handle === themeHandle) {
-          const ranking = {
-            rank: rank,
-            theme: this.themes[j].themeId,
-            name: this.themes[j].handle
-          }
-          this.rankings = [...this.rankings, ranking];
-        }
-      }
-    });
   }
 }
 

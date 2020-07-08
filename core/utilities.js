@@ -65,6 +65,52 @@ class Utilities {
     }
     return unique;
   }
+
+  static processReviewPercentage($, theme) {
+    const percentageRegex = /\d{1,}/g;
+    const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
+    const entry = {
+      percentPositive: Number(percentage[0]),
+      name: theme.handle,
+      theme: theme.themeId
+    }
+    return entry;
+  }
+
+  static processRankingDataFromPage($, pageNumber, themes) {
+    let rankingsFromPage = [];
+    $('.theme-info a').each((i, el) => {
+      const themeHandle = $(el).attr('data-trekkie-theme-handle');
+      const rank = (24 * (pageNumber - 1)) + i + 1;
+      for (let j = 0; j < themes.length; j++) {
+        if (themes[j].handle === themeHandle) {
+          const ranking = {
+            rank: rank,
+            theme: themes[j].themeId,
+            name: themes[j].handle
+          }
+          rankingsFromPage = [...rankingsFromPage, ranking];
+        }
+      }
+    });
+    return [...rankingsFromPage];
+  }
+
+  static processReviewDataFromPage($, theme) {
+    let reviewsFromPage = [];
+    $('.review').each((i, el) => {
+      const review = {
+        themeId: theme.themeId,
+        handle: theme.handle,
+        storeTitle: $(el).find('.review-title__author').text(),
+        description: $(el).find('.review__body').text(),
+        sentiment: this.analyzeSentiment($(el).find('.review-graph__icon')),
+        date: this.formatDate($(el).find('.review-title__date').text())
+      }
+      reviewsFromPage = [...reviewsFromPage, review];
+    });
+    return reviewsFromPage;
+  }
 }
 
 module.exports = Utilities;
