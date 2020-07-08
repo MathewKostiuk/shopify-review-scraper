@@ -1,10 +1,10 @@
 const DBAccess = require('../db/db-access');
 const Scraper = require('./scraper');
-const Utilities = require('./utilities');
 
 class ReviewPercentages {
   constructor() {
     this.percentages = [];
+    this.category = 'percent-positive';
   }
 
   async init() {
@@ -16,11 +16,9 @@ class ReviewPercentages {
   }
 
   async fetchData(theme) {
-    const scraper = new Scraper(theme.url, 1, false);
-    const pageData = await scraper.pageData;
-
-    const percentage = Utilities.processReviewPercentage(pageData, theme);
-    this.percentages = [...this.percentages, percentage];
+    const scraper = new Scraper(this.category, 1, theme);
+    await scraper.scrapePage();
+    this.percentages = [...this.percentages, scraper.result];
   }
 }
 

@@ -1,13 +1,13 @@
-const axios = require('axios');
-
 const DBAccess = require('../db/db-access');
 const Scraper = require('./scraper');
 const Utilities = require('./utilities');
+const pingSlack = require('../services/slack');
 
 class Reviews {
   constructor() {
     this.reviews = {};
     this.processedReviews = {};
+    this.category = 'reviews';
   }
 
   async init() {
@@ -21,52 +21,14 @@ class Reviews {
   async fetchData(theme) {
     this.reviews[theme.handle] = [];
 
-    const scraper = new Scraper(theme.url, 1, false);
-    const pageData = await scraper.pageData;
-    const numberOfPages = Utilities.getTotalNumberOfPages(pageData);
-
+    const scraper = new Scraper(this.category, 1, theme);
+    await scraper.scrapePage(true);
+    const numberOfPages = scraper.numberOfPages;
     for (let i = 0; i < numberOfPages; i++) {
-      const newScraper = new Scraper(theme.url, i + 1, false);
-      const newPageData = await newScraper.pageData;
-      const pageReviews = Utilities.processReviewDataFromPage(newPageData, theme);
-      this.reviews[theme.handle] = [...this.reviews[theme.handle], ...pageReviews];
+      const newScraper = new Scraper(this.category, i + 1, theme);
+      await newScraper.scrapePage();
+      this.reviews[theme.handle] = [...this.reviews[theme.handle], ...newScraper.result];
     }
-  }
-
-  pingSlack(review, isNew) {
-    const messageHeading = isNew ? `*${review.storeTitle}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(review.handle)}*:` :
-      `*${review.storeTitle}* removed their ${review.sentiment} review for ${Utilities.capitalizeFirstLetter(review.handle)}:`;
-
-    const options = {
-      method: 'post',
-      url: `${process.env.SLACK_URL}`,
-      data: {
-        "text": "This is a test",
-        "blocks": [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": `${messageHeading}`
-            },
-            "block_id": "text1"
-          },
-          {
-            "type": "divider"
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": `> ${review.description}`
-            }
-          }
-        ]
-      }
-    }
-    axios(options)
-      .then(() => console.log(`Incoming review: ${review}`))
-      .catch(error => console.log(error));
   }
 
   dispatchReviews() {
@@ -77,13 +39,13 @@ class Reviews {
       if (this.processedReviews[handle].save) {
         this.processedReviews[handle].save.forEach(async (review) => {
           await DBAccess.saveReview(review).catch(e => console.log(e));
-          this.pingSlack(review, true);
+          pingSlack(review, true);
         });
       }
       if (this.processedReviews[handle].delete) {
         this.processedReviews[handle].delete.forEach(async (review) => {
           await DBAccess.deleteReview(review).catch(e => console.log(e));
-          this.pingSlack(review, false);
+          pingSlack(review, false);
         });
       }
       if (this.processedReviews[handle].firstLoad) {
