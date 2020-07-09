@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3002
 
 const DBAccess = require('./db/db-access');
 const themesRoutes = require('./routes/themes')(DBAccess);
@@ -21,3 +21,6 @@ leaderboardCronJob.run();
 
 const reviewPercentagesCronJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
 reviewPercentagesCronJob.run();
+
+const tester = new Rankings();
+tester.init();
