@@ -21,6 +21,3 @@ leaderboardCronJob.run();
 
 const reviewPercentagesCronJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
 reviewPercentagesCronJob.run();
-
-const tester = new Rankings();
-tester.init();
