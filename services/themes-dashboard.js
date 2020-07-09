@@ -1,18 +1,17 @@
 const axios = require('axios');
 
 async function insertRankingsToDashboard(rankings) {
-  console.log(rankings);
   if (!process.env.DASHBOARD_URL) {
     return;
   }
   
   const options = {
     method: 'post',
-    url: `${process.env.DASHBOARD_URL}/api/2.0/platform/shopify/themes/rankings`,
+    url: `${process.env.DASHBOARD_URL}/api/2.0/themes/rankings`,
     data: rankings,
     auth: {
       username: 'paskit',
-      password: process.env.PASKIT_PASSWORD
+      password: process.env.PASKIT_PASS
     }
   };
   axios(options)

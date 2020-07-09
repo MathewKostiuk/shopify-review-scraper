@@ -90,8 +90,8 @@ class Scraper {
         if (themes[j].handle === themeHandle) {
           const ranking = {
             rank: rank,
-            theme: themes[j].themeId,
-            name: themes[j].handle
+            themeId: themes[j].themeId,
+            theme: themes[j].handle
           }
           rankingsFromPage = [...rankingsFromPage, ranking];
         }
