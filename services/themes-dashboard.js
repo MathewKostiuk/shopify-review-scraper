@@ -14,6 +14,7 @@ async function insertRankingsToDashboard(rankings) {
       password: process.env.PASKIT_PASS
     }
   };
+  console.log(options);
   axios(options)
     .then(() => console.log('Rankings submitted to the Themes Dashboard'))
     .catch(error => console.log(error));
