@@ -1,23 +1,23 @@
-const axios = require('axios');
+const fetch = require('node-fetch');
 
 async function insertRankingsToDashboard(rankings) {
   if (!process.env.DASHBOARD_URL) {
     return;
   }
-  
-  const options = {
-    method: 'post',
-    url: `${process.env.DASHBOARD_URL}/api/2.0/themes/rankings`,
-    data: rankings,
-    auth: {
-      username: 'paskit',
-      password: process.env.PASKIT_PASS
-    }
-  };
-  console.log(options);
-  axios(options)
-    .then(() => console.log('Rankings submitted to the Themes Dashboard'))
-    .catch(error => console.log(error));
+
+  const webhook = `${process.env.DASHBOARD_URL}/api/2.0/themes/rankings`;
+
+  fetch(
+    webhook,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${process.env.PASKIT_PASS}`
+      },
+      body: JSON.stringify(rankings),
+    },
+  ).catch(error => console.log(error));
 }
 
 module.exports = insertRankingsToDashboard;
