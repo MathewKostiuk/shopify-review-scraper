@@ -85,7 +85,9 @@ class Scraper {
     let rankingsFromPage = [];
     $('.theme-info a').each((i, el) => {
       const themeHandle = $(el).attr('data-trekkie-theme-handle');
-      const rank = (24 * (this.pageNumber - 1)) + i + 1;
+      // 24 themes per page, i should get offset by 1 due to starting at 0.
+      // Subtract the 9 free Shopify themes from the score
+      const rank = (24 * (this.pageNumber - 1)) + i + 1 - 9;
       for (let j = 0; j < themes.length; j++) {
         if (themes[j].handle === themeHandle) {
           const ranking = {
