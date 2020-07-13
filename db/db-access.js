@@ -8,7 +8,7 @@ const db = require('./index');
   
   static async saveReview(review) {
     try {
-      return await db('reviews').insert(review, ['storeTitle', 'handle', 'sentiment', 'description', 'date']);
+      return await db('reviews').insert(review, ['store_title', 'handle', 'sentiment', 'description', 'date']);
     } catch (error) {
       console.log(error);
     }
@@ -17,7 +17,7 @@ const db = require('./index');
   static async deleteReview(review) {
     try {
       return await db('reviews').where({
-        storeTitle: review.storeTitle,
+        store_title: review.store_title,
         handle: review.handle,
         sentiment: review.sentiment,
         description: review.description

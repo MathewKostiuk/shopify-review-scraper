@@ -108,7 +108,7 @@ class Scraper {
       const review = {
         theme_id: theme.theme_id,
         handle: theme.handle,
-        storeTitle: $(el).find('.review-title__author').text(),
+        store_title: $(el).find('.review-title__author').text(),
         description: $(el).find('.review__body').text(),
         sentiment: Utilities.analyzeSentiment($(el).find('.review-graph__icon')),
         date: Utilities.formatDate($(el).find('.review-title__date').text())

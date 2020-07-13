@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 function pingSlack(review, isNew) {
-  const messageHeading = isNew ? `*${review.storeTitle}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(review.handle)}*:` :
-    `*${review.storeTitle}* removed their ${review.sentiment} review for ${Utilities.capitalizeFirstLetter(review.handle)}:`;
+  const messageHeading = isNew ? `*${review.store_title}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(review.handle)}*:` :
+    `*${review.store_title}* removed their ${review.sentiment} review for ${Utilities.capitalizeFirstLetter(review.handle)}:`;
 
   const options = {
     method: 'post',

@@ -42,7 +42,7 @@ class Utilities {
   static isUnique(review, array) {
     let unique = true;
     for (let i = 0; i < array.length; i ++) {
-      if (review.storeTitle === array[i].storeTitle && review.description === array[i].description && review.sentiment === array[i].sentiment) {
+      if (review.store_title === array[i].store_title && review.description === array[i].description && review.sentiment === array[i].sentiment) {
         unique = false;
         break;
       }

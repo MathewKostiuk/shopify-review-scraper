@@ -10,7 +10,7 @@ exports.up = knex => {
       table.increments('reviewId');
       table.integer('theme_id').unsigned().notNullable();
       table.string('handle', 20);
-      table.string('storeTitle', 150);
+      table.string('store_title', 150);
       table.string('description', 1000);
       table.string('sentiment', 10);
       table.date('date');
