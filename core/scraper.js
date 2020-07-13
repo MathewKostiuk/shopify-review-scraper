@@ -74,7 +74,7 @@ class Scraper {
     const percentageRegex = /\d{1,}/g;
     const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
     const entry = {
-      percentPositive: Number(percentage[0]),
+      percent_positive: Number(percentage[0]),
       name: theme.handle,
       theme: theme.theme_id
     }
