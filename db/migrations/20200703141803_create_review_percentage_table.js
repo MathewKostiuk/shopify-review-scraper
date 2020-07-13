@@ -7,7 +7,7 @@ exports.up = function(knex) {
       table.string('name');
       table.integer('theme').unsigned().notNullable();
       table.datetime('created_at', { precision: 6 }).defaultTo(knex.fn.now(6));
-      table.foreign('theme').references('themeId').inTable('themes');
+      table.foreign('theme').references('theme_id').inTable('themes');
     })
 };
 

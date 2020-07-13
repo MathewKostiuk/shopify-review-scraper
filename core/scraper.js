@@ -76,7 +76,7 @@ class Scraper {
     const entry = {
       percentPositive: Number(percentage[0]),
       name: theme.handle,
-      theme: theme.themeId
+      theme: theme.theme_id
     }
     return entry;
   }
@@ -92,7 +92,7 @@ class Scraper {
         if (themes[j].handle === themeHandle) {
           const ranking = {
             rank: rank,
-            themeId: themes[j].themeId,
+            theme_id: themes[j].theme_id,
             theme: themes[j].handle
           }
           rankingsFromPage = [...rankingsFromPage, ranking];
@@ -106,7 +106,7 @@ class Scraper {
     let reviewsFromPage = [];
     $('.review').each((i, el) => {
       const review = {
-        themeId: theme.themeId,
+        theme_id: theme.theme_id,
         handle: theme.handle,
         storeTitle: $(el).find('.review-title__author').text(),
         description: $(el).find('.review__body').text(),
