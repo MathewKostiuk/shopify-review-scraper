@@ -4,7 +4,6 @@ const Scraper = require('./scraper');
 class ReviewPercentages {
   constructor() {
     this.percentages = [];
-    this.category = 'percent-positive';
   }
 
   async init() {
@@ -16,9 +15,21 @@ class ReviewPercentages {
   }
 
   async fetchData(theme) {
-    const scraper = new Scraper(this.category, 1, theme);
+    const scraper = new Scraper(1, theme);
     await scraper.scrapePage();
-    this.percentages = [...this.percentages, scraper.result];
+    const HTML = scraper.pageHTML;
+    const percentage = this.processPercentPositive(HTML, theme);
+    this.percentages = [...this.percentages, percentage];
+  }
+
+  processPercentPositive($, theme) {
+    const percentageRegex = /\d{1,}/g;
+    const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
+    const entry = {
+      percent_positive: Number(percentage[0]),
+      theme: theme.theme_id
+    }
+    return entry;
   }
 }
 

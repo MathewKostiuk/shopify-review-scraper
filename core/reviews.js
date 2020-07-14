@@ -7,7 +7,6 @@ class Reviews {
   constructor() {
     this.reviews = {};
     this.processedReviews = {};
-    this.category = 'reviews';
   }
 
   async init() {
@@ -21,14 +20,33 @@ class Reviews {
   async fetchData(theme) {
     this.reviews[theme.theme_id] = [];
 
-    const scraper = new Scraper(this.category, 1, theme);
+    const scraper = new Scraper(1, theme);
     await scraper.scrapePage(true);
-    const numberOfPages = scraper.numberOfPages;
+    const pageHTML = scraper.pageHTML;
+    const numberOfPages = Utilities.getTotalNumberOfPages(pageHTML);
+
     for (let i = 0; i < numberOfPages; i++) {
-      const newScraper = new Scraper(this.category, i + 1, theme);
+      const newScraper = new Scraper(i + 1, theme);
       await newScraper.scrapePage();
-      this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...newScraper.result];
+      const currentPageHTML = newScraper.pageHTML;
+      const reviewsFrompage = this.processReviewData(currentPageHTML, theme);
+      this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...reviewsFrompage];
     }
+  }
+
+  processReviewData($, theme) {
+    let reviewsFromPage = [];
+    $('.review').each((i, el) => {
+      const review = {
+        theme_id: theme.theme_id,
+        store_title: $(el).find('.review-title__author').text(),
+        description: $(el).find('.review__body').text(),
+        sentiment: Utilities.analyzeSentiment($(el).find('.review-graph__icon')),
+        date: Utilities.formatDate($(el).find('.review-title__date').text())
+      }
+      reviewsFromPage = [...reviewsFromPage, review];
+    });
+    return reviewsFromPage;
   }
 
   dispatchReviews() {
