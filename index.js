@@ -6,18 +6,21 @@ const DBAccess = require('./db/db-access');
 const themesRoutes = require('./routes/themes')(DBAccess);
 const CronJobs = require('./core/cron-jobs');
 
-const Reviews = require('./core/reviews');
 const Rankings = require('./core/rankings');
 const ReviewPercentages = require('./core/review-percentage');
+
+const OOTSReviewsScraper = require('./core/oots-reviews');
+const PXUReviewsScraper = require('./core/pxu-reviews');
 
 app.use('/themes', themesRoutes);
 app.listen(port);
 
-const reviewsCronJob = new CronJobs('5 * * * *', 'reviews', Reviews);
-reviewsCronJob.run();
+const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
+const ootsReviewsJob = new CronJobs('10 * * * *', 'reviews', OOTSReviewsScraper, 2);
+const pxuLeaderboardJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings);
+const pxuReviewPercentagesJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
 
-const leaderboardCronJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings);
-leaderboardCronJob.run();
-
-const reviewPercentagesCronJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
-reviewPercentagesCronJob.run();
+pxuReviewsJob.run();
+pxuLeaderboardJob.run();
+pxuReviewPercentagesJob.run();
+ootsReviewsJob.run();
