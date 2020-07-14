@@ -1,5 +1,3 @@
-const cheerio = require('cheerio');
-
 class Utilities {
   static analyzeSentiment(el) {
     if (el.hasClass('icon--review-positive')) {

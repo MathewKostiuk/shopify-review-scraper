@@ -4,52 +4,84 @@ const Utilities = require('./utilities');
 const pingSlack = require('../services/slack');
 
 class Reviews {
-  constructor() {
+  constructor(brand_id) {
+    this.brand_id = brand_id;
     this.reviews = {};
     this.processedReviews = {};
-    this.category = 'reviews';
   }
 
   async init() {
-    this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
+    this.themes = await DBAccess.getThemesByBrandId(this.brand_id).catch(e => console.log(e));
     await Promise.all(this.themes.map(async theme => await this.fetchData(theme))).catch(e => console.log(e));
     await this.processReviews().catch(e => console.log(e));
-    this.dispatchReviews();
-    return true;
+    await this.dispatchReviews();
   }
 
   async fetchData(theme) {
     this.reviews[theme.theme_id] = [];
 
-    const scraper = new Scraper(this.category, 1, theme);
+    const scraper = new Scraper(1, theme);
     await scraper.scrapePage(true);
-    const numberOfPages = scraper.numberOfPages;
+    const pageHTML = scraper.pageHTML;
+    const numberOfPages = Utilities.getTotalNumberOfPages(pageHTML);
+
     for (let i = 0; i < numberOfPages; i++) {
-      const newScraper = new Scraper(this.category, i + 1, theme);
+      const newScraper = new Scraper(i + 1, theme);
       await newScraper.scrapePage();
-      this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...newScraper.result];
+      const currentPageHTML = newScraper.pageHTML;
+      const reviewsFrompage = this.processReviewData(currentPageHTML, theme);
+      this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...reviewsFrompage];
     }
   }
 
-  dispatchReviews() {
-    const themeIDs = Object.keys(this.processedReviews);
+  processReviewData($, theme) {
+    let reviewsFromPage = [];
+    $('.review').each((i, el) => {
+      const review = {
+        theme_id: theme.theme_id,
+        store_title: $(el).find('.review-title__author').text(),
+        description: $(el).find('.review__body').text(),
+        sentiment: Utilities.analyzeSentiment($(el).find('.review-graph__icon')),
+        date: Utilities.formatDate($(el).find('.review-title__date').text())
+      }
+      reviewsFromPage = [...reviewsFromPage, review];
+    });
+    return reviewsFromPage;
+  }
 
+  async handleNewReviews(reviews) {
+    const theme = await DBAccess.getThemeByID(reviews[0].theme_id);
+    reviews.forEach(async (review) => {
+      await DBAccess.saveReview(review).catch(e => console.log(e));
+      pingSlack(review, true, this.brand_id, theme[0].handle);
+    });
+  }
+
+  async handleDeletedReviews(reviews) {
+    const theme = await DBAccess.getThemeByID(reviews[0].theme_id);
+    reviews.forEach(async (review) => {
+      await DBAccess.deleteReview(review).catch(e => console.log(e));
+      pingSlack(review, false, this.brand_id, theme[0].handle);
+    });
+  }
+
+  async handleFirstLoad(reviews) {
+    reviews.forEach(async (review) => await DBAccess.saveReview(review).catch(e => console.log(e)));
+  }
+
+  async dispatchReviews() {
+    const themeIDs = Object.keys(this.processedReviews);
     for (let i = 0; i < themeIDs.length; i++) {
       const themeID = themeIDs[i];
       if (this.processedReviews[themeID].save) {
-        this.processedReviews[themeID].save.forEach(async (review) => {
-          await DBAccess.saveReview(review).catch(e => console.log(e));
-          pingSlack(review, true);
-        });
+        await this.handleNewReviews(this.processedReviews[themeID].save);
       }
       if (this.processedReviews[themeID].delete) {
-        this.processedReviews[themeID].delete.forEach(async (review) => {
-          await DBAccess.deleteReview(review).catch(e => console.log(e));
-          pingSlack(review, false);
-        });
+        await this.handleDeletedReviews(this.processedReviews[themeID].delete);
+
       }
       if (this.processedReviews[themeID].firstLoad) {
-        this.processedReviews[themeID].firstLoad.forEach(async (review) => await DBAccess.saveReview(review).catch(e => console.log(e)));
+        await this.handleFirstLoad(this.processedReviews[themeID].firstLoad);
       }
     }
   }

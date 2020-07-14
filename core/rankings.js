@@ -1,23 +1,23 @@
 const DBAccess = require('../db/db-access');
 const Scraper = require('./scraper');
+const Utilities = require('./utilities');
 const insertRankingsInDashboard = require('../services/themes-dashboard');
 
 class Rankings {
   constructor() {
     this.url = `https://themes.shopify.com/themes`;
-    this.category = 'rankings';
     this.rankings = [];
   }
 
   async init() {
     this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
-    const scraper = new Scraper(this.category, 1, this.themes);
-    await scraper.scrapePage(true);
-    this.numberOfPages = scraper.numberOfPages;
+    const scraper = new Scraper(1, this.themes, true);
+    await scraper.scrapePage();
+    const pageHTML = scraper.pageHTML;
+    this.numberOfPages = Utilities.getTotalNumberOfPages(pageHTML);
 
     await this.fetchAllRankings().catch(e => console.log(e));
     await DBAccess.insertRankings(this.rankings);
-    await this.addHandlesToRankings();
     const rankingsForDashboard = await this.addHandlesToRankings();
     await insertRankingsInDashboard(rankingsForDashboard);
   }
@@ -35,11 +35,33 @@ class Rankings {
   async fetchAllRankings() {
     for (let i = 0; i < this.numberOfPages; i++) {
       const pageNumber = i + 1;
-      const scraper = new Scraper(this.category, pageNumber, this.themes);
+      const scraper = new Scraper(pageNumber, this.themes, true);
       await scraper.scrapePage();
-      this.rankings = [...this.rankings, ...scraper.result];
+      const HTML = scraper.pageHTML;
+      const rankingsFromPage = this.processRankingsData(HTML, pageNumber);
+      this.rankings = [...this.rankings, ...rankingsFromPage];
     }
     return true;
+  }
+
+  processRankingsData($, page) {
+    let rankingsFromPage = [];
+    $('.theme-info a').each((i, el) => {
+      const themeHandle = $(el).attr('data-trekkie-theme-handle');
+      // 24 themes per page, i should get offset by 1 due to starting at 0.
+      // Subtract the 9 free Shopify themes from the score
+      const rank = (24 * (page - 1)) + i + 1 - 9;
+      for (let j = 0; j < this.themes.length; j++) {
+        if (this.themes[j].handle === themeHandle) {
+          const ranking = {
+            rank: rank,
+            theme_id: this.themes[j].theme_id,
+          }
+          rankingsFromPage = [...rankingsFromPage, ranking];
+        }
+      }
+    });
+    return [...rankingsFromPage];
   }
 }
 

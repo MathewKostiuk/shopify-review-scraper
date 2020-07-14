@@ -6,9 +6,9 @@ const db = require('./index');
     return await db('themes');
   }
   
-  static async saveReview(review) {
+  static async getThemesByBrandId(brand_id) {
     try {
-      return await db('reviews').insert(review);
+      return await db('themes').where('brand_id', brand_id);   
     } catch (error) {
       console.log(error);
     }
@@ -25,6 +25,14 @@ const db = require('./index');
   static async getThemeByHandle(handle) {
     try {
       return await db('themes').where('handle', handle);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  static async saveReview(review) {
+    try {
+      return await db('reviews').insert(review);
     } catch (error) {
       console.log(error);
     }
@@ -64,6 +72,14 @@ const db = require('./index');
   static async savePercentage(percentage) {
     try {
       return await db('percent_positive').insert(percentage);      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  static async getBrandId(brand) {
+    try {
+      return await db('brands').where('brand', brand);
     } catch (error) {
       console.log(error)
     }
