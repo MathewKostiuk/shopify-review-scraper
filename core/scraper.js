@@ -75,7 +75,6 @@ class Scraper {
     const percentage = $('#Reviews .heading--2').text().match(percentageRegex);
     const entry = {
       percent_positive: Number(percentage[0]),
-      name: theme.handle,
       theme: theme.theme_id
     }
     return entry;
@@ -93,7 +92,6 @@ class Scraper {
           const ranking = {
             rank: rank,
             theme_id: themes[j].theme_id,
-            theme: themes[j].handle
           }
           rankingsFromPage = [...rankingsFromPage, ranking];
         }
@@ -107,7 +105,6 @@ class Scraper {
     $('.review').each((i, el) => {
       const review = {
         theme_id: theme.theme_id,
-        handle: theme.handle,
         store_title: $(el).find('.review-title__author').text(),
         description: $(el).find('.review__body').text(),
         sentiment: Utilities.analyzeSentiment($(el).find('.review-graph__icon')),
