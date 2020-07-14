@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3002
 
 const DBAccess = require('./db/db-access');
 const themesRoutes = require('./routes/themes')(DBAccess);
@@ -17,7 +17,7 @@ app.listen(port);
 
 const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
 const ootsReviewsJob = new CronJobs('10 * * * *', 'reviews', OOTSReviewsScraper, 2);
-const pxuLeaderboardJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings);
+const pxuLeaderboardJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings, 1);
 const pxuReviewPercentagesJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
 
 pxuReviewsJob.run();
