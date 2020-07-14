@@ -8,7 +8,8 @@ module.exports = (DBAccess) => {
   })
 
   themesRoutes.get('/:theme', async (req, res) => {
-    const themeReviews = await DBAccess.getReviews(req.params.theme);
+    const theme = await DBAccess.getThemeByHandle(req.params.theme);
+    const themeReviews = await DBAccess.getReviews(theme[0].theme_id);
     res.json({ themeReviews });
   })
 

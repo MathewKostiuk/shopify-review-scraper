@@ -17,7 +17,19 @@ class Rankings {
 
     await this.fetchAllRankings().catch(e => console.log(e));
     await DBAccess.insertRankings(this.rankings);
-    await insertRankingsInDashboard(this.rankings);
+    await this.addHandlesToRankings();
+    const rankingsForDashboard = await this.addHandlesToRankings();
+    await insertRankingsInDashboard(rankingsForDashboard);
+  }
+
+  async addHandlesToRankings() {
+    return await Promise.all(this.rankings.map(async ranking => {
+      const theme = await DBAccess.getThemeByID(ranking.theme_id);
+      return {
+        ...ranking,
+        theme: theme[0].handle,
+      }
+    }));
   }
 
   async fetchAllRankings() {

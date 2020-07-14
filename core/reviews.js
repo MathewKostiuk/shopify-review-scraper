@@ -19,7 +19,7 @@ class Reviews {
   }
 
   async fetchData(theme) {
-    this.reviews[theme.handle] = [];
+    this.reviews[theme.theme_id] = [];
 
     const scraper = new Scraper(this.category, 1, theme);
     await scraper.scrapePage(true);
@@ -27,29 +27,29 @@ class Reviews {
     for (let i = 0; i < numberOfPages; i++) {
       const newScraper = new Scraper(this.category, i + 1, theme);
       await newScraper.scrapePage();
-      this.reviews[theme.handle] = [...this.reviews[theme.handle], ...newScraper.result];
+      this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...newScraper.result];
     }
   }
 
   dispatchReviews() {
-    const handles = Object.keys(this.processedReviews);
+    const themeIDs = Object.keys(this.processedReviews);
 
-    for (let i = 0; i < handles.length; i++) {
-      const handle = handles[i];
-      if (this.processedReviews[handle].save) {
-        this.processedReviews[handle].save.forEach(async (review) => {
+    for (let i = 0; i < themeIDs.length; i++) {
+      const themeID = themeIDs[i];
+      if (this.processedReviews[themeID].save) {
+        this.processedReviews[themeID].save.forEach(async (review) => {
           await DBAccess.saveReview(review).catch(e => console.log(e));
           pingSlack(review, true);
         });
       }
-      if (this.processedReviews[handle].delete) {
-        this.processedReviews[handle].delete.forEach(async (review) => {
+      if (this.processedReviews[themeID].delete) {
+        this.processedReviews[themeID].delete.forEach(async (review) => {
           await DBAccess.deleteReview(review).catch(e => console.log(e));
           pingSlack(review, false);
         });
       }
-      if (this.processedReviews[handle].firstLoad) {
-        this.processedReviews[handle].firstLoad.forEach(async (review) => await DBAccess.saveReview(review).catch(e => console.log(e)));
+      if (this.processedReviews[themeID].firstLoad) {
+        this.processedReviews[themeID].firstLoad.forEach(async (review) => await DBAccess.saveReview(review).catch(e => console.log(e)));
       }
     }
   }
@@ -60,15 +60,15 @@ class Reviews {
     want to flood the Slack channel with a tonne of messages. The remaining reviews should be analyzed
     to determine whether they are new reviews or deleted reviews
     */
-    const handles = Object.keys(this.reviews);
+    const themeIDs = Object.keys(this.reviews);
 
-    for (let i = 0; i < handles.length; i++) {
-      const handle = handles[i];
-      const reviewsInDB = await DBAccess.getReviews(handle).catch(e => console.log(e));
+    for (let i = 0; i < themeIDs.length; i++) {
+      const themeID = themeIDs[i];
+      const reviewsInDB = await DBAccess.getReviews(themeID).catch(e => console.log(e));
       if (reviewsInDB && reviewsInDB.length === 0) {
         // Database is empty so just save the reviews and skip the ping to Slack
-        this.processedReviews[handle] = {
-          firstLoad: this.reviews[handle]
+        this.processedReviews[themeID] = {
+          firstLoad: this.reviews[themeID]
         }
         continue;
       }
@@ -77,13 +77,13 @@ class Reviews {
       Determine which theme reviews are new so that we can build an appropriate message
       in Slack.   
       */
-      const filteredPageReviews = this.reviews[handle].filter(review => Utilities.isUnique(review, reviewsInDB));
+      const filteredPageReviews = this.reviews[themeID].filter(review => Utilities.isUnique(review, reviewsInDB));
 
       // Determine which reviews have been deleted
-      const filteredDatabaseReviews = reviewsInDB.filter(review => Utilities.isUnique(review, this.reviews[handle]));
+      const filteredDatabaseReviews = reviewsInDB.filter(review => Utilities.isUnique(review, this.reviews[themeID]));
 
-      this.processedReviews[handle] = {
-        ...this.processedReviews[handle],
+      this.processedReviews[themeID] = {
+        ...this.processedReviews[themeID],
         save: filteredPageReviews,
         delete: filteredDatabaseReviews
       };
