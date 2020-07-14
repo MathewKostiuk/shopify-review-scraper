@@ -8,7 +8,7 @@ const db = require('./index');
   
   static async saveReview(review) {
     try {
-      return await db('reviews').insert(review, ['store_title', 'sentiment', 'description', 'date']);
+      return await db('reviews').insert(review);
     } catch (error) {
       console.log(error);
     }
