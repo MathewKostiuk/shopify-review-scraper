@@ -116,8 +116,8 @@ class Reviews {
 
       this.processedReviews[themeID] = {
         ...this.processedReviews[themeID],
-        save: filteredPageReviews,
-        delete: filteredDatabaseReviews
+        save: filteredPageReviews.length > 0 ? filteredPageReviews : null,
+        delete: filteredDatabaseReviews.length > 0 ? filteredDatabaseReviews : null
       };
     }
   }
