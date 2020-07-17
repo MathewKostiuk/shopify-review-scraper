@@ -23,4 +23,4 @@ const pxuReviewPercentagesJob = new CronJobs('0 21 * * *', 'percent positives', 
 pxuReviewsJob.run();
 pxuLeaderboardJob.run();
 pxuReviewPercentagesJob.run();
-ootsReviewsJob.run();
+// ootsReviewsJob.run();
