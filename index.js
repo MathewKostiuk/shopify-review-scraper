@@ -16,11 +16,11 @@ app.use('/themes', themesRoutes);
 app.listen(port);
 
 const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
-const ootsReviewsJob = new CronJobs('10 * * * *', 'reviews', OOTSReviewsScraper, 2);
+const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
 const pxuLeaderboardJob = new CronJobs('0 20 * * *', 'the leaderboard', Rankings, 1);
 const pxuReviewPercentagesJob = new CronJobs('0 21 * * *', 'percent positives', ReviewPercentages);
 
 pxuReviewsJob.run();
 pxuLeaderboardJob.run();
 pxuReviewPercentagesJob.run();
-// ootsReviewsJob.run();
+ootsReviewsJob.run();
