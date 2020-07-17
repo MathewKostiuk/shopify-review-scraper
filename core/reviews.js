@@ -12,16 +12,17 @@ class Reviews {
   }
 
   async init() {
-    this.themes = await DBAccess.getThemesByBrandId(this.brand_id).catch(() => this.handleErrorState());
+    this.themes = await DBAccess.getThemesByBrandId(this.brand_id).catch(() => this.handleErrorState(e));
     await Promise.all(this.themes.map(async theme => {
-      return await this.fetchData(theme).catch(() => this.handleErrorState());
+      return await this.fetchData(theme).catch(() => this.handleErrorState(e));
     }));
-    await this.processReviews().catch(() => this.handleErrorState());
+    await this.processReviews().catch(() => this.handleErrorState(e));
     await this.dispatchReviews();
   }
 
-  handleErrorState() {
+  handleErrorState(e) {
     this.hasError = true;
+    console.log(e);
   }
 
   async fetchData(theme) {
@@ -37,7 +38,7 @@ class Reviews {
 
     for (let i = 0; i < numberOfPages; i++) {
       const newScraper = new Scraper(i + 1, theme);
-      await newScraper.scrapePage().catch(() => this.handleErrorState());
+      await newScraper.scrapePage().catch(() => this.handleErrorState(e));
       const currentPageHTML = newScraper.pageHTML;
       const reviewsFrompage = this.processReviewData(currentPageHTML, theme);
       this.reviews[theme.theme_id] = [...this.reviews[theme.theme_id], ...reviewsFrompage];
@@ -60,23 +61,23 @@ class Reviews {
   }
 
   async handleNewReviews(reviews) {
-    const theme = await DBAccess.getThemeByID(reviews[0].theme_id).catch(() => this.handleErrorState());
+    const theme = await DBAccess.getThemeByID(reviews[0].theme_id).catch(() => this.handleErrorState(e));
     reviews.forEach(async (review) => {
-      await DBAccess.saveReview(review).catch(() => this.handleErrorState());
+      await DBAccess.saveReview(review).catch(() => this.handleErrorState(e));
       pingSlack(review, true, this.brand_id, theme[0].handle);
     });
   }
 
   async handleDeletedReviews(reviews) {
-    const theme = await DBAccess.getThemeByID(reviews[0].theme_id).catch(() => this.handleErrorState());
+    const theme = await DBAccess.getThemeByID(reviews[0].theme_id).catch(() => this.handleErrorState(e));
     reviews.forEach(async (review) => {
-      await DBAccess.deleteReview(review).catch(() => this.handleErrorState());
+      await DBAccess.deleteReview(review).catch(() => this.handleErrorState(e));
       pingSlack(review, false, this.brand_id, theme[0].handle);
     });
   }
 
   async handleFirstLoad(reviews) {
-    reviews.forEach(async (review) => await DBAccess.saveReview(review).catch(() => this.handleErrorState()));
+    reviews.forEach(async (review) => await DBAccess.saveReview(review).catch(() => this.handleErrorState(e)));
   }
 
   async dispatchReviews() {
@@ -87,14 +88,14 @@ class Reviews {
     for (let i = 0; i < themeIDs.length; i++) {
       const themeID = themeIDs[i];
       if (this.processedReviews[themeID].save) {
-        await this.handleNewReviews(this.processedReviews[themeID].save).catch(() => this.handleErrorState());
+        await this.handleNewReviews(this.processedReviews[themeID].save).catch(() => this.handleErrorState(e));
       }
       if (this.processedReviews[themeID].delete) {
-        await this.handleDeletedReviews(this.processedReviews[themeID].delete).catch(() => this.handleErrorState());
+        await this.handleDeletedReviews(this.processedReviews[themeID].delete).catch(() => this.handleErrorState(e));
 
       }
       if (this.processedReviews[themeID].firstLoad) {
-        await this.handleFirstLoad(this.processedReviews[themeID].firstLoad).catch(() => this.handleErrorState());
+        await this.handleFirstLoad(this.processedReviews[themeID].firstLoad).catch(() => this.handleErrorState(e));
       }
     }
   }
@@ -112,7 +113,7 @@ class Reviews {
 
     for (let i = 0; i < themeIDs.length; i++) {
       const themeID = themeIDs[i];
-      const reviewsInDB = await DBAccess.getReviews(themeID).catch(() => this.handleErrorState());
+      const reviewsInDB = await DBAccess.getReviews(themeID).catch(() => this.handleErrorState(e));
       if (reviewsInDB && reviewsInDB.length === 0) {
         // Database is empty so just save the reviews and skip the ping to Slack
         this.processedReviews[themeID] = {
