@@ -1,7 +1,7 @@
 const DBAccess = require('../db/db-access');
 const Scraper = require('./scraper');
 const Utilities = require('./utilities');
-const insertRankingsInDashboard = require('../services/themes-dashboard');
+const themesDashboard = require('../services/themes-dashboard');
 
 class Rankings {
   constructor(brand_id) {
@@ -20,7 +20,7 @@ class Rankings {
     await this.fetchAllRankings().catch(e => console.log(e));
     await DBAccess.insertRankings(this.rankings);
     const rankingsForDashboard = await this.addHandlesToRankings();
-    await insertRankingsInDashboard(rankingsForDashboard);
+    await themesDashboard.insertRankingsInDashboard(rankingsForDashboard);
   }
 
   async addHandlesToRankings() {
