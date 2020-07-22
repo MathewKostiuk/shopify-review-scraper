@@ -25,5 +25,5 @@ pxuLeaderboardJob.run();
 pxuReviewPercentagesJob.run();
 ootsReviewsJob.run();
 
-const firstDataSet = new ReviewPercentages(1);
-firstDataSet.init();
+const second = new ReviewPercentages(1);
+second.init();
