@@ -24,6 +24,3 @@ pxuReviewsJob.run();
 pxuLeaderboardJob.run();
 pxuReviewPercentagesJob.run();
 ootsReviewsJob.run();
-
-const second = new ReviewPercentages(1);
-second.init();
