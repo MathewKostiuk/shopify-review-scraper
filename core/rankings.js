@@ -20,7 +20,7 @@ class Rankings {
     await this.fetchAllRankings().catch(e => console.log(e));
     await DBAccess.insertRankings(this.rankings);
     const rankingsForDashboard = await this.addHandlesToRankings();
-    await themesDashboard.insertRankingsInDashboard(rankingsForDashboard);
+    await themesDashboard.insertRankingsToDashboard(rankingsForDashboard);
   }
 
   async addHandlesToRankings() {
