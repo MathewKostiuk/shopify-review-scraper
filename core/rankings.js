@@ -4,14 +4,13 @@ const Utilities = require('./utilities');
 const themesDashboard = require('../services/themes-dashboard');
 
 class Rankings {
-  constructor(brand_id) {
+  constructor() {
     this.url = `https://themes.shopify.com/themes`;
     this.rankings = [];
-    this.brand_id = brand_id
   }
 
   async init() {
-    this.themes = await DBAccess.getThemesByBrandId(this.brand_id).catch(e => console.log(e));
+    this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
     const scraper = new Scraper(1, this.themes, true);
     await scraper.scrapePage();
     const pageHTML = scraper.pageHTML;

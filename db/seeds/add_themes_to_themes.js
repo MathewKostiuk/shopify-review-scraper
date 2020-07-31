@@ -24,7 +24,7 @@ exports.seed = function(knex) {
         { handle: 'responsive', url: 'https://themes.shopify.com/themes/responsive/styles/london', brand_id: 2 },
         { handle: 'retina', url: 'https://themes.shopify.com/themes/retina/styles/austin', brand_id: 2 },
         { handle: 'parallax', url: 'https://themes.shopify.com/themes/parallax/styles/aspen', brand_id: 2 },
-        { handle: 'mobillia', url: 'https://themes.shopify.com/themes/mobilia/styles/milan', brand_id: 2 },
+        { handle: 'mobilia', url: 'https://themes.shopify.com/themes/mobilia/styles/milan', brand_id: 2 },
         { handle: 'artisan', url: 'https://themes.shopify.com/themes/artisan/styles/victoria', brand_id: 2 },
       ]);
     });

@@ -3,7 +3,11 @@ const db = require('./index');
 
  class DBAccess {
   static async getAllThemes() {
-    return await db('themes');
+    try {
+      return await db('themes');   
+    } catch (error) {
+      console.log(error);
+    }
   }
   
   static async getThemesByBrandId(brand_id) {
