@@ -4,13 +4,12 @@ const Scraper = require('./scraper');
 const themesDashboard = require('../services/themes-dashboard');
 
 class ReviewPercentages {
-  constructor(brand_id) {
+  constructor() {
     this.percentages = [];
-    this.brand_id = brand_id
   }
 
   async init() {
-    this.themes = await DBAccess.getThemesByBrandId(this.brand_id).catch(e => console.log(e));
+    this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
     await Promise.all(this.themes.map(async theme => await this.fetchData(theme)))
       .catch(e => console.log(e));
     await DBAccess.savePercentage(this.percentages);
