@@ -50,7 +50,7 @@ class Reviews {
     $('.review').each((i, el) => {
       const review = {
         theme_id: theme.theme_id,
-        store_title: $(el).find('.review-title__author').text(),
+        store_title: $(el).find('.review-title__author').first().text(),
         description: $(el).find('.review__body').text(),
         sentiment: Utilities.analyzeSentiment($(el).find('.review-graph__icon')),
         date: Utilities.formatDate($(el).find('.review-title__date').text())
