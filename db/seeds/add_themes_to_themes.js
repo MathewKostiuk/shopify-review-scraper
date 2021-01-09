@@ -1,7 +1,16 @@
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries
-  return knex('themes').del()
+  return knex('reviews').del()
+  .then(function() {
+    return knex('percent_positive').del()
+  })
+  .then(function() {
+    return knex('rankings').del()
+  })
+  .then(function() {
+    return knex('themes').del()
+  })
   .then(function() {
     return knex('brands').insert([
       { brand: 'Pixel Union' },

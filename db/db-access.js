@@ -58,7 +58,7 @@ const db = require('./index');
   
   static async getReviews(theme_id) {
     try {
-      const reviews = await db('reviews').where('theme_id', theme_id).orderBy('date', 'desc');
+      const reviews = await db('reviews').where('theme_id', theme_id);
       return reviews;
     } catch (error) {
       console.log(error);

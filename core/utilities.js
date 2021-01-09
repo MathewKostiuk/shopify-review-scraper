@@ -9,25 +9,6 @@ class Utilities {
     }
   }
   
-  static formatDate(el) {
-    const daysRegex = /(\d{1,2})\s(days?\sago)/;
-    const hoursRegex = /(\d{1,2})\s(hours?\sago)/;
-    const minutesRegex = /(\d{1,2})\s(minutes?\sago)/;
-  
-    if (daysRegex.test(el)) {
-      const numberOfDays = el.match(daysRegex)[1];
-      return new Date(Date.now() - (86400000 * numberOfDays))
-    } else if (hoursRegex.test(el)) {
-      const numberOfHours = el.match(hoursRegex)[1];
-      return new Date(Date.now() - (3600000 * numberOfHours));
-    } else if(minutesRegex.test(el)) {
-      const numberOfMinutes = el.match(minutesRegex)[1];
-      return new Date(Date.now() - (60000 * numberOfMinutes));
-    } else {
-      return new Date(el);
-    }
-  }
-
   static getTotalNumberOfPages($) {
     const numberOfPages = Number($('.next_page').prev().text());
     return numberOfPages > 0 ? numberOfPages : 1;
