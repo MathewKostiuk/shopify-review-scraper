@@ -15,12 +15,12 @@ const PXUReviewsScraper = require('./core/pxu-reviews');
 app.use('/themes', themesRoutes);
 app.listen(port);
 
-const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
-const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
-const fetchRankings = new CronJobs('0 20 * * 5', 'the leaderboard', Rankings);
-const pxuReviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
+// const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
+// const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
+// const fetchRankings = new CronJobs('0 20 * * 5', 'the leaderboard', Rankings);
+// const pxuReviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
 
-pxuReviewsJob.run();
-fetchRankings.run();
-pxuReviewPercentagesJob.run();
-ootsReviewsJob.run();
+// pxuReviewsJob.run();
+// fetchRankings.run();
+// pxuReviewPercentagesJob.run();
+// ootsReviewsJob.run();
