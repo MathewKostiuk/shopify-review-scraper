@@ -1,6 +1,6 @@
-const Reviews = require('./reviews');
+const ReviewsScraper = require('./reviews-scraper');
 
-class OOTSReviewsScraper extends Reviews {
+class OOTSReviewsScraper extends ReviewsScraper {
   constructor(brand_id) {
     super(brand_id);
   }

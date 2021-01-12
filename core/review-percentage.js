@@ -1,4 +1,5 @@
-const DBAccess = require('../db/db-access');
+const Themes = require('../db/models/themes');
+const PercentPositive = require('../db/models/percent-positive');
 const Scraper = require('./scraper');
 
 const themesDashboard = require('../services/themes-dashboard');
@@ -9,10 +10,10 @@ class ReviewPercentages {
   }
 
   async init() {
-    this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
+    this.themes = await Themes.getAllThemes().catch(e => console.log(e));
     await Promise.all(this.themes.map(async theme => await this.fetchData(theme)))
       .catch(e => console.log(e));
-    await DBAccess.savePercentage(this.percentages);
+    await PercentPositive.save(this.percentages);
     const payload = this.addHandlesToPayload();
     await themesDashboard.insertReviewsToDashboard(payload);
   }
