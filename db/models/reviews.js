@@ -33,17 +33,27 @@ class Reviews {
   }
 
   static async exists(review) {
-    let review;
+    let result;
     try {
-      review = await db('reviews').where({
+      result = await db('reviews').where({
         store_title: review.store_title,
-        sentiment: review.sentiment
+        sentiment: review.sentiment,
+        description: review.description
       })
     } catch (error) {
       console.log(error);
     }
+    return result.length === 1;
+  }
 
-    return review.length === 1;
+  static async isEmpty() {
+    let result;
+    try {
+      result = await db('reviews');
+    } catch (error) {
+      console.log(error);
+    }
+    return result.length === 0;
   }
 }
 

@@ -2,8 +2,7 @@ const axios = require('axios');
 const Utilities = require('../core/utilities');
 
 function pingSlack(review, isNew, brand_id, handle) {
-  const messageHeading = isNew ? `*${review.store_title}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(handle)}*:` :
-    `*${review.store_title}* removed their ${review.sentiment} review for ${Utilities.capitalizeFirstLetter(handle)}:`;
+  const messageHeading = `*${review.store_title}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(handle)}*:`;
 
   const messageDescription = review.description;
 
