@@ -1,30 +1,31 @@
-const DBAccess = require('../db/db-access');
+const Themes = require('../db/models/themes');
+const Rankings = require('../db//models/rankings');
 const Scraper = require('./scraper');
 const Utilities = require('./utilities');
 const themesDashboard = require('../services/themes-dashboard');
 
-class Rankings {
+class RankingsScraper {
   constructor() {
     this.url = `https://themes.shopify.com/themes`;
     this.rankings = [];
   }
 
   async init() {
-    this.themes = await DBAccess.getAllThemes().catch(e => console.log(e));
+    this.themes = await Themes.getAllThemes().catch(e => console.log(e));
     const scraper = new Scraper(1, this.themes, true);
     await scraper.scrapePage();
     const pageHTML = scraper.pageHTML;
     this.numberOfPages = Utilities.getTotalNumberOfPages(pageHTML);
 
     await this.fetchAllRankings().catch(e => console.log(e));
-    await DBAccess.insertRankings(this.rankings);
+    await Rankings.save(this.rankings);
     const rankingsForDashboard = await this.addHandlesToRankings();
     await themesDashboard.insertRankingsToDashboard(rankingsForDashboard);
   }
 
   async addHandlesToRankings() {
     return await Promise.all(this.rankings.map(async ranking => {
-      const theme = await DBAccess.getThemeByID(ranking.theme_id);
+      const theme = await Themes.getThemeByID(ranking.theme_id);
       return {
         ...ranking,
         theme: theme[0].handle,
@@ -65,4 +66,4 @@ class Rankings {
   }
 }
 
-module.exports = Rankings;
+module.exports = RankingsScraper;

@@ -2,11 +2,11 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000
 
-const DBAccess = require('./db/db-access');
-const themesRoutes = require('./routes/themes')(DBAccess);
+const Themes = require('./db/models/themes');
+const themesRoutes = require('./routes/themes')(Themes);
 const CronJobs = require('./core/cron-jobs');
 
-const Rankings = require('./core/rankings');
+const RankingsScraper = require('./core/rankings');
 const ReviewPercentages = require('./core/review-percentage');
 
 const OOTSReviewsScraper = require('./core/oots-reviews');
@@ -24,3 +24,5 @@ app.listen(port);
 // fetchRankings.run();
 // pxuReviewPercentagesJob.run();
 // ootsReviewsJob.run();
+const test = new PXUReviewsScraper(1);
+test.init();
