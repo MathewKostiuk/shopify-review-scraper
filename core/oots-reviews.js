@@ -1,4 +1,4 @@
-const ReviewsScraper = require('./reviews');
+const ReviewsScraper = require('./reviews-scraper');
 
 class OOTSReviewsScraper extends ReviewsScraper {
   constructor(brand_id) {

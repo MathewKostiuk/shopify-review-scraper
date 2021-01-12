@@ -1,5 +1,5 @@
 const Themes = require('../db/models/themes');
-const Rankings = require('../db//models/rankings');
+const Rankings = require('../db/models/rankings');
 const Scraper = require('./scraper');
 const Utilities = require('./utilities');
 const themesDashboard = require('../services/themes-dashboard');
