@@ -20,7 +20,7 @@ const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper,
 const fetchRankings = new CronJobs('0 20 * * 5', 'the leaderboard', RankingsScraper);
 const pxuReviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
 
-pxuReviewsJob.run();
+// pxuReviewsJob.run();
 fetchRankings.run();
 pxuReviewPercentagesJob.run();
-ootsReviewsJob.run();
+// ootsReviewsJob.run();
