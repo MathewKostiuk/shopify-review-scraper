@@ -1,7 +1,7 @@
 const express = require('express');
 const themesRoutes = express.Router();
 
-module.exports = (Themes) => {
+module.exports = (Themes, Reviews) => {
   themesRoutes.get('/', async (req, res) => {
     const themes = await Themes.getAllThemes();
     res.json({ themes });
@@ -9,8 +9,7 @@ module.exports = (Themes) => {
 
   themesRoutes.get('/:theme', async (req, res) => {
     const theme = await Themes.getThemeByHandle(req.params.theme);
-    console.log(Themes);
-    const themeReviews = await Themes.getReviews(theme[0].theme_id);
+    const themeReviews = await Reviews.getAllByThemeId(theme[0].theme_id);
     res.json({ themeReviews });
   })
 

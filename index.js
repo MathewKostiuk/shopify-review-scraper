@@ -3,7 +3,8 @@ const app = express();
 const port = process.env.PORT || 3000
 
 const Themes = require('./db/models/themes');
-const themesRoutes = require('./routes/themes')(Themes);
+const Reviews = require('./db/models/reviews');
+const themesRoutes = require('./routes/themes')(Themes, Reviews);
 const CronJobs = require('./core/cron-jobs');
 
 const RankingsScraper = require('./core/rankings-scraper');
