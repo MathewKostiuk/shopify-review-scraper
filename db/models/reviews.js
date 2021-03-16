@@ -46,10 +46,10 @@ class Reviews {
     return result.length === 1;
   }
 
-  static async isEmpty() {
+  static async themeReviewsEmpty(theme_id) {
     let result;
     try {
-      result = await db('reviews');
+      result = await db('reviews').where('theme_id', theme_id);
     } catch (error) {
       console.log(error);
     }

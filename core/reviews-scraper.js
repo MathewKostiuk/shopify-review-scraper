@@ -8,11 +8,9 @@ class ReviewsScraper {
   constructor(brand_id) {
     this.brand_id = brand_id;
     this.hasError = false;
-    this.emptyDB = true;
   }
 
   async init() {
-    this.emptyDB = await Reviews.isEmpty();
     this.themes = await Themes.getThemesByBrandId(this.brand_id).catch((e) => this.handleErrorState(e));
     await Promise.all(this.themes.map(async theme => {
       return await this.fetchData(theme).catch((e) => this.handleErrorState(e));
@@ -29,6 +27,8 @@ class ReviewsScraper {
       return;
     }
 
+    const themeReviewsEmpty = await Reviews.themeReviewsEmpty(theme.theme_id);
+
     // Checking the first 3 pages of reviews should cover 99% of cases
     const numberOfPages = 3;
 
@@ -36,11 +36,11 @@ class ReviewsScraper {
       const newScraper = new Scraper(i + 1, theme);
       await newScraper.scrapePage().catch((e) => this.handleErrorState(e));
       const currentPageHTML = newScraper.pageHTML;
-      this.processReviewData(currentPageHTML, theme);
+      this.processReviewData(currentPageHTML, theme, themeReviewsEmpty);
     }
   }
 
-  processReviewData($, theme) {
+  processReviewData($, theme, themeReviewsEmpty) {
     $('.review').each((i, el) => {
       const review = {
         theme_id: theme.theme_id,
@@ -52,16 +52,16 @@ class ReviewsScraper {
       Reviews.exists(review)
         .then(exists => {
           if (!exists) {
-            this.handleNewReview(review);
+            this.handleNewReview(review, themeReviewsEmpty);
           }
         });
     });
   }
 
-  async handleNewReview(review) {
+  async handleNewReview(review, themeReviewsEmpty) {
     const theme = await Themes.getThemeByID(review.theme_id).catch((e) => this.handleErrorState(e));
     await Reviews.save(review).catch((e) => this.handleErrorState(e));
-    if (!this.emptyDB) {
+    if (!themeReviewsEmpty) {
       pingSlack(review, true, this.brand_id, theme[0].handle);
     }
   }
