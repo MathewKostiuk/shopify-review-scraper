@@ -18,7 +18,7 @@ app.listen(port);
 
 const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
 const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
-const fetchRankings = new CronJobs('0 20 * * 5', 'the leaderboard', RankingsScraper);
+const fetchRankings = new CronJobs('0 20 * * *', 'the leaderboard', RankingsScraper);
 const pxuReviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
 
 pxuReviewsJob.run();
