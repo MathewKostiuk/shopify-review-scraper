@@ -41,7 +41,7 @@ class ReviewsScraper {
   }
 
   processReviewData($, theme, themeReviewsEmpty) {
-    $('.review').each((i, el) => {
+    $('#ReviewsTabContent .review').each((i, el) => {
       const review = {
         theme_id: theme.theme_id,
         store_title: $(el).find('.review-title__author').first().text(),
