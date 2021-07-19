@@ -43,7 +43,7 @@ class Reviews {
     } catch (error) {
       console.log(error);
     }
-    return result.length === 1;
+    return result.length > 0;
   }
 
   static async themeReviewsEmpty(theme_id) {
