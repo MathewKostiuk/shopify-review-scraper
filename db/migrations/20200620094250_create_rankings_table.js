@@ -8,7 +8,7 @@ exports.up = function(knex) {
         table.string('theme');
         table.datetime('created_at', { precision: 6 }).defaultTo(knex.fn.now(6));
         table.foreign('theme_id').references('theme_id').inTable('themes');
-    })
+    });
 };
 
 exports.down = function(knex) {
