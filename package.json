@@ -9,8 +9,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "server-start": "node index.js",
+    "client-start": "cd client && react-scripts start",
     "db": "knex migrate:rollback && knex migrate:latest && knex seed:run",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-dev": "concurrently --kill-others \"npm run start\" \"npm:start --prefix client\""
   },
   "author": "",
   "license": "ISC",
@@ -25,5 +28,8 @@
     "pg": "8.5.1",
     "request": "2.88.2",
     "request-promise": "4.2.5"
+  },
+  "devDependencies": {
+    "concurrently": "^6.4.0"
   }
 }

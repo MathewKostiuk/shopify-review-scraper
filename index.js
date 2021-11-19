@@ -1,6 +1,7 @@
+const path = require('path');
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3001
 
 const Themes = require('./db/models/themes');
 const Reviews = require('./db/models/reviews');
@@ -15,6 +16,9 @@ const PXUReviewsScraper = require('./core/pxu-reviews');
 
 app.use('/themes', themesRoutes);
 app.listen(port);
+
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
 const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
