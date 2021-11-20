@@ -6,6 +6,9 @@ exports.up = function(knex) {
       table.string('name');
       table.string('url');
       table.integer('brand_id').unsigned().notNullable();
+      table.boolean('positive');
+      table.boolean('negative');
+      table.boolean('neutral');
       table.foreign('brand_id').references('brand_id').inTable('brands');
     });
 };

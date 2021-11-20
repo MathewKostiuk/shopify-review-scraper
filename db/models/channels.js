@@ -6,6 +6,16 @@ class Channels {
       return await db('channels');
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  static async getChannelById(id) {
+    try {
+      return await db('channels').where({ id });
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 
@@ -14,14 +24,16 @@ class Channels {
       return await db('channels').insert(channel);
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 
-  static async deleteChannel({ id }) {
+  static async deleteChannel(id) {
     try {
       return await db('channels').where({ id }).del();
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 
@@ -30,6 +42,7 @@ class Channels {
       return await db('channels').where('brand_id', brandId);
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 }
