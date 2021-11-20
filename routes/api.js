@@ -7,7 +7,7 @@ router.get('/channels', async (req, res) => {
   res.json({ channels });
 });
 
-router.get('/channels/:brand_id', async (req, res) => {
+router.get('/channels/brand/:brand_id', async (req, res) => {
   try {
     const channel = await Channels.getChannelsByBrandId(req.params.brand_id);
     res.json({ channel });
