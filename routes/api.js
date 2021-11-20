@@ -1,5 +1,8 @@
 const express = require('express');
+const Reviews = require('../db/models/reviews')
 const Channels = require('../db/models/channels');
+const Themes = require('../db/models/themes');
+const Slack = require('../services/slack');
 const router = express.Router();
 
 router.get('/channels', async (req, res) => {

@@ -62,7 +62,7 @@ class ReviewsScraper {
     const theme = await Themes.getThemeByID(review.theme_id).catch((e) => this.handleErrorState(e));
     await Reviews.save(review).catch((e) => this.handleErrorState(e));
     if (!themeReviewsEmpty) {
-      pingSlack(review, true, this.brand_id, theme[0].handle);
+      pingSlack(review, this.brand_id, theme[0].handle);
     }
   }
 }

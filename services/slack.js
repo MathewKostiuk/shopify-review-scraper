@@ -1,21 +1,19 @@
 const axios = require('axios');
 const Utilities = require('../core/utilities');
+const Channels = require('../db/models/channels');
 
-function pingSlack(review, isNew, brand_id, handle) {
-  const messageHeading = `*${review.store_title}* left a new ${review.sentiment} review for *${Utilities.capitalizeFirstLetter(handle)}*:`;
+async function pingSlack(review, brand_id, handle) {
+  const { store_title: title, sentiment, description } = review;
+  const messageHeading = `*${title}* left a new ${sentiment} review for *${Utilities.capitalizeFirstLetter(handle)}*:`;
+  const channels = await findChannels(brand_id);
 
-  const messageDescription = review.description;
-
-  if (brand_id === 1) {
-    sendMessage(messageHeading, `${process.env.SLACK_URL}`, messageDescription);
-  } else {
-    if (review.sentiment === 'negative' || review.sentiment === 'neutral') {
-      sendMessage(messageHeading, `${process.env.OOTS_MERCHANT_ADVOCATES_URL}`, messageDescription);
-      sendMessage(messageHeading, `${process.env.OOTS_SUPPORT_URL}`, messageDescription);
-    } else {
-      sendMessage(messageHeading, `${process.env.OOTS_SUPPORT_URL}`, messageDescription);
-    }
+  for (let i = 0; i < channels.length; i++) {
+    sendMessage(messageHeading, channels[i].url, description);
   }
+}
+
+async function findChannels(brand_id) {
+  return await Channels.getChannelsByBrandId(brand_id);
 }
 
 function sendMessage(message, url, description) {

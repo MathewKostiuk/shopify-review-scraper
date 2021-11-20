@@ -7,6 +7,17 @@ class Reviews {
       return reviews;
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  static async getFirstReviewByThemeId(themeId) {
+    try {
+      const reviews = await db('reviews').where('theme_id', themeId);
+      return reviews[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 
@@ -15,6 +26,7 @@ class Reviews {
       return await db('reviews').insert(review);
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 
@@ -29,6 +41,7 @@ class Reviews {
       .del();
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 
@@ -42,6 +55,7 @@ class Reviews {
       })
     } catch (error) {
       console.log(error);
+      throw error;
     }
     return result.length > 0;
   }
@@ -52,6 +66,7 @@ class Reviews {
       result = await db('reviews').where('theme_id', theme_id);
     } catch (error) {
       console.log(error);
+      throw error;
     }
     return result.length === 0;
   }
