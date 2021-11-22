@@ -3,9 +3,6 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3001
 
-const Themes = require('./db/models/themes');
-const Reviews = require('./db/models/reviews');
-const themesRoutes = require('./routes/themes')(Themes, Reviews);
 const apiRouter = require('./routes/api');
 const CronJobs = require('./core/cron-jobs');
 
@@ -16,7 +13,6 @@ const OOTSReviewsScraper = require('./core/oots-reviews');
 const PXUReviewsScraper = require('./core/pxu-reviews');
 
 app.use(express.json({ limit: '50mb' }));
-app.use('/themes', themesRoutes);
 app.use('/api/1.0', apiRouter);
 app.listen(port);
 

@@ -1,8 +1,6 @@
 const express = require('express');
-const Reviews = require('../db/models/reviews')
 const Channels = require('../db/models/channels');
 const Themes = require('../db/models/themes');
-const Slack = require('../services/slack');
 const router = express.Router();
 
 router.get('/channels', async (req, res) => {
@@ -40,5 +38,17 @@ router.delete('/channels/:channel_id', async (req, res) => {
     res.statusMessage = "Not found";
   }
 });
+
+router.get('/themes', async (req, res) => {
+  const themes = await Themes.getAllThemes();
+  res.json({ themes });
+});
+
+router.get('/themes/:theme', async (req, res) => {
+  const theme = await Themes.getThemeByHandle(req.params.theme);
+  const themeReviews = await Reviews.getAllByThemeId(theme[0].theme_id);
+  res.json({ themeReviews });
+});
+
 
 module.exports = router;
