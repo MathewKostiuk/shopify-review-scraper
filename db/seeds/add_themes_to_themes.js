@@ -3,6 +3,9 @@ exports.seed = function(knex) {
   // Deletes ALL existing entries
   return knex('reviews').del()
   .then(function() {
+    return knex('app_reviews').del()
+  })
+  .then(function() {
     return knex('percent_positive').del()
   })
   .then(function() {
@@ -12,12 +15,15 @@ exports.seed = function(knex) {
     return knex('themes').del()
   })
   .then(function() {
+    return knex('apps').del()
+  })
+  .then(function() {
     return knex('brands').insert([
       { brand: 'Pixel Union' },
       { brand: 'Out of the Sandbox' }
     ])
   })
-  .then(function () {
+  .then(function() {
     // Inserts seed entries
     return knex('themes').insert([
       { handle: 'atlantic', url: 'https://themes.shopify.com/themes/atlantic/styles/modern', brand_id: 1 },
@@ -35,6 +41,11 @@ exports.seed = function(knex) {
       { handle: 'parallax', url: 'https://themes.shopify.com/themes/parallax/styles/aspen', brand_id: 2 },
       { handle: 'mobilia', url: 'https://themes.shopify.com/themes/mobilia/styles/milan', brand_id: 2 },
       { handle: 'artisan', url: 'https://themes.shopify.com/themes/artisan/styles/victoria', brand_id: 2 },
+    ]);
+  })
+  .then(function() {
+    return knex('apps').insert([
+      { handle: 'theme-updater-app', url: 'https://apps.shopify.com/theme-updater-by-out-of-the-sandbox/reviews', brand_id: 2 },
     ]);
   });
 };

@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 
 class CronJobs {
-  constructor(interval, task, obj, brand_id) {
+  constructor(interval, task, obj) {
     this.interval = interval;
     this.task = task;
     this.obj = obj;

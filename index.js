@@ -9,6 +9,7 @@ const apiRouter = require('./routes/api');
 const CronJobs = require('./core/cron-jobs');
 
 const ReviewsScraper = require('./core/reviews-scraper');
+const AppReviewsScraper = require('./core/app-reviews-scraper');
 const RankingsScraper = require('./core/rankings-scraper');
 const ReviewPercentages = require('./core/review-percentage');
 
@@ -24,10 +25,12 @@ app.get('*', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
-const themeReviewsJob = new CronJobs('5 * * * *', 'reviews', ReviewsScraper);
+const themeReviewsJob = new CronJobs('5 * * * *', 'theme reviews', ReviewsScraper);
+const appReviewsJob = new CronJobs('10 * * * *', 'app reviews', AppReviewsScraper);
 const themeRankingsJob = new CronJobs('0 20 * * *', 'the leaderboard', RankingsScraper);
 const reviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
 
 themeReviewsJob.run();
+appReviewsJob.run();
 themeRankingsJob.run();
 reviewPercentagesJob.run();
