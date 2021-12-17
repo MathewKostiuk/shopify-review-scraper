@@ -1,16 +1,16 @@
 const path = require('path');
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 3001;
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const apiRouter = require('./routes/api');
 const CronJobs = require('./core/cron-jobs');
 
+const ReviewsScraper = require('./core/reviews-scraper');
 const RankingsScraper = require('./core/rankings-scraper');
 const ReviewPercentages = require('./core/review-percentage');
-
-const OOTSReviewsScraper = require('./core/oots-reviews');
-const PXUReviewsScraper = require('./core/pxu-reviews');
 
 app.use(express.json({ limit: '50mb' }));
 app.use('/api/1.0', apiRouter);
@@ -24,12 +24,10 @@ app.get('*', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
-const pxuReviewsJob = new CronJobs('5 * * * *', 'reviews', PXUReviewsScraper, 1);
-const ootsReviewsJob = new CronJobs('40 * * * *', 'reviews', OOTSReviewsScraper, 2);
-const fetchRankings = new CronJobs('0 20 * * *', 'the leaderboard', RankingsScraper);
-const pxuReviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
+const themeReviewsJob = new CronJobs('5 * * * *', 'reviews', ReviewsScraper);
+const themeRankingsJob = new CronJobs('0 20 * * *', 'the leaderboard', RankingsScraper);
+const reviewPercentagesJob = new CronJobs('0 21 * * 5', 'percent positives', ReviewPercentages);
 
-pxuReviewsJob.run();
-fetchRankings.run();
-pxuReviewPercentagesJob.run();
-ootsReviewsJob.run();
+themeReviewsJob.run();
+themeRankingsJob.run();
+reviewPercentagesJob.run();

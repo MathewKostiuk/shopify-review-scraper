@@ -5,13 +5,12 @@ const Utilities = require('./utilities');
 const pingSlack = require('../services/slack');
 
 class ReviewsScraper {
-  constructor(brand_id) {
-    this.brand_id = brand_id;
+  constructor() {
     this.hasError = false;
   }
 
   async init() {
-    this.themes = await Themes.getThemesByBrandId(this.brand_id).catch((e) => this.handleErrorState(e));
+    this.themes = await Themes.getAllThemes().catch((e) => this.handleErrorState(e));
     await Promise.all(this.themes.map(async theme => {
       return await this.fetchData(theme).catch((e) => this.handleErrorState(e));
     }));
@@ -52,17 +51,16 @@ class ReviewsScraper {
       Reviews.exists(review)
         .then(exists => {
           if (!exists) {
-            this.handleNewReview(review, themeReviewsEmpty);
+            this.handleNewReview(review, themeReviewsEmpty, theme);
           }
         });
     });
   }
 
-  async handleNewReview(review, themeReviewsEmpty) {
-    const theme = await Themes.getThemeByID(review.theme_id).catch((e) => this.handleErrorState(e));
+  async handleNewReview(review, themeReviewsEmpty, theme) {
     await Reviews.save(review).catch((e) => this.handleErrorState(e));
     if (!themeReviewsEmpty) {
-      pingSlack(review, this.brand_id, theme[0].handle);
+      pingSlack(review, theme.brand_id, theme.handle);
     }
   }
 }

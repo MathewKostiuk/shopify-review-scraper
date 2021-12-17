@@ -5,12 +5,11 @@ class CronJobs {
     this.interval = interval;
     this.task = task;
     this.obj = obj;
-    this.brand_id = brand_id
   }
 
   run() {
     cron.schedule(this.interval, async () => {
-      const object = new this.obj(this.brand_id);
+      const object = new this.obj();
       await object.init();
       const date = new Date();
       this.message = `Last crawled ${this.task} on ${date.toLocaleDateString()} at ${date.toLocaleTimeString('en-US')}`
